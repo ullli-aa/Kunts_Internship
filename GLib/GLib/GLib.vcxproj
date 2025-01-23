@@ -140,6 +140,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GLib.cpp" />
+    <ClCompile Include="LibPoint.cpp" />
+    <ClCompile Include="LibUtility.cpp" />
+    <ClCompile Include="LibVector.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LibPoint.h" />
+    <ClInclude Include="LibUtility.h" />
+    <ClInclude Include="LibVector.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

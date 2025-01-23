@@ -3,7 +3,7 @@
 template<typename T>
 class LibPoint {
 public:
-	LibPoint() = default;
+	LibPoint();
 	LibPoint(T x, T y);
 	LibPoint(T x, T y, T z);
 

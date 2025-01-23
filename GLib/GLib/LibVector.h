@@ -6,61 +6,68 @@ template<typename T>
 class LibVector {
 public:
 	LibVector() = default;
-	LibVector(const LibPoint& pt_coordinates);
+	LibVector(const LibPoint& ptCoordinates);
 	~LibVector() = default;
 
-	inline const LibPoint& Coordinates() const
+	inline const LibPoint<T>& Coordinates() const
 	{
-		return m_pt_coord;
+		return m_PtCoord;
 	};
 
 	inline T X() const
 	{
-		return m_pt_coord.X();
+		return m_PtCoord.X();
 	}
 	inline T Y() const
 	{
-		return m_pt_coord.Y();
+		return m_PtCoord.Y();
 	}
 	inline T Z() const
 	{
-		return m_pt_coord.Z();
+		return m_PtCoord.Z();
 	}
 	inline LibVector& SetX(T x)
 	{
-		m_pt_coord.SetX(x);
+		m_PtCoord.SetX(x);
 		return *this;
 	}
 	inline LibVector& SetY(T y)
 	{
-		m_pt_coord.SetY(y);
+		m_PtCoord.SetY(y);
 		return *this;
 	}
 	inline LibVector& SetZ(T z)
 	{
-		m_pt_coord.SetZ(z);
+		m_PtCoord.SetZ(z);
 		return *this;
 	}
 	inline void SetCoordinates(const LibPoint& coordinates)
 	{
-		m_pt_coord = coordinates;
-	};
+		m_PtCoord = coordinates;
+	}
 
-	LibVector operator*(T scalar);
-	LibVector operator+(const LibVector& other);
-	LibVector operator-(const LibVector& other);
+	bool IsCollinear(const LibVector& other) const;
+	LibVector<T> operator*(T scalar);
+	LibVector<T> operator/(T scalar);
+	LibVector<T> operator+(const LibVector& other);
+	LibVector<T> operator-(const LibVector& other);
 	bool operator==(const LibVector& other);
 	bool operator!=(const LibVector& other);
-	bool IsEqual(const LibVector& other, double eps = 1e-9);
+	bool IsEqual(const LibVector& other, double eps = 1e-9) const;
 
-	double LengthVector();
+	double LengthVector() const;
 	void Normalize();
 
-	double DotProduct(const LibVector& other);
-	LibVector CrossProduct(const LibVector& other);
+	double DotProduct(const LibVector& other) const;
+	LibVector<T> CrossProduct(const LibVector& other) const;
+
+	T AngleBetweenVec(const LibVector& other) const;
+	T DistBetweenVec(const LibVector& other) const;
+
+	LibVector<T> Rotate2D(double angle) const;
 
 private:
-	LibPoint m_pt_coord;
+	LibPoint<T> m_PtCoord;
 };
 
 template<typename T>

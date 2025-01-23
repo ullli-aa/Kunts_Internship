@@ -18,5 +18,25 @@
     <ClCompile Include="GLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LibPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibUtility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LibVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="LibPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibUtility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
