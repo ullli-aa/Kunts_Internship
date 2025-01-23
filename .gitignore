@@ -1,0 +1,11 @@
+# Visual Studio
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.sln.docstates
+
+# Другие временные файлы
+*.tmp
+*.log 
