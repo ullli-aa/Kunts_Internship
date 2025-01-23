@@ -2,52 +2,58 @@
 
 #include "libVector.h"
 
-LibVector::LibVector() : m_pt_coord(0, 0, 0) {}
-LibVector::LibVector(const LibPoint& pt_coordinates)
+template <typename T>
+LibVector<T>::LibVector(const LibPoint<T>& pt_coordinates)
 {
 	m_pt_coord = pt_coordinates;
 }
 
-LibVector::~LibVector() = default;
-
-LibVector LibVector::operator*(double scalar)
+template <typename T>
+LibVector<T> LibVector<T>::operator*(T scalar)
 {
 	return LibVector(LibPoint(m_pt_coord.X() * scalar, m_pt_coord.Y() * scalar, m_pt_coord.Z() * scalar));
 }
 
-LibVector LibVector::operator+(const LibVector & other)
+template <typename T>
+LibVector<T> LibVector<T>::operator+(const LibVector & other)
 {
 	LibPoint other_coord = other.m_pt_coord;
 	return LibVector(LibPoint(m_pt_coord.X() + other_coord.X(), m_pt_coord.Y() + other_coord.Y(), m_pt_coord.Z() + other_coord.Z()));
 };
 
-LibVector LibVector::operator-(const LibVector & other)
+template <typename T>
+LibVector<T> LibVector<T>::operator-(const LibVector & other)
 {
 	LibPoint other_coord = other.m_pt_coord;
 	return LibVector(LibPoint(m_pt_coord.X() - other_coord.X(), m_pt_coord.Y() - other_coord.Y(), m_pt_coord.Z() - other_coord.Z()));
 }
 
-bool LibVector::operator==(const LibVector & other)
+template <typename T>
+bool LibVector<T>::operator==(const LibVector & other)
 {
 	return m_pt_coord == other.m_pt_coord;
 }
 
-bool LibVector::operator!=(const LibVector & other)
+template <typename T>
+bool LibVector<T>::operator!=(const LibVector & other)
 {
 	return m_pt_coord != other.m_pt_coord;;
 }
 
-bool LibVector::IsEqual(const LibVector & other, double eps)
+template <typename T>
+bool LibVector<T>::IsEqual(const LibVector & other, double eps)
 {
 	return m_pt_coord.IsEqual(other.m_pt_coord);
 }
 
-double LibVector::LengthVector()
+template <typename T>
+double LibVector<T>::LengthVector()
 {
 	return m_pt_coord.DistanceTo(LibPoint(0, 0, 0));
 }
 
-void LibVector::Normalize()
+template <typename T>
+void LibVector<T>::Normalize()
 {
 	double length = LengthVector();
 	if (length != 0) {
@@ -55,13 +61,15 @@ void LibVector::Normalize()
 	}
 }
 
-double LibVector::DotProduct(const LibVector & other)
+template <typename T>
+double LibVector<T>::DotProduct(const LibVector & other)
 {
 	LibPoint other_coord = other.m_pt_coord;
 	return m_pt_coord.X() * other_coord.X() + m_pt_coord.Y() * other_coord.Y() + m_pt_coord.Z() * other_coord.Z();
 }
 
-LibVector LibVector::CrossProduct(const LibVector & other)
+template <typename T>
+LibVector<T> LibVector<T>::CrossProduct(const LibVector & other)
 {
 	LibPoint other_coord = other.m_pt_coord;
 	return LibVector(LibPoint(
@@ -70,7 +78,8 @@ LibVector LibVector::CrossProduct(const LibVector & other)
 		m_pt_coord.X() * other_coord.Y() - m_pt_coord.Y() * other_coord.X()));
 }
 
-LibVector operator*(double scalar, const LibVector & vec)
+template <typename T>
+LibVector<T> operator*(double scalar, const LibVector<T> & vec)
 {
 	return LibVector();
 }

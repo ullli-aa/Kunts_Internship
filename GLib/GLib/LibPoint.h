@@ -1,51 +1,51 @@
 #pragma once
 
-//template<class T>
+template<typename T>
 class LibPoint {
 public:
-	LibPoint();
-	LibPoint(double x, double y);
-	LibPoint(double x, double y, double z);
+	LibPoint() = default;
+	LibPoint(T x, T y);
+	LibPoint(T x, T y, T z);
 
-	~LibPoint();
+	~LibPoint() = default;
 
-	double SquareDistanceTo(const LibPoint& other) const;
-	double DistanceTo(const LibPoint& other) const;
+	T SquareDistanceTo(const LibPoint& other) const;
+	T DistanceTo(const LibPoint& other) const;
 
 	bool operator==(const LibPoint& other) const;
 	bool operator!=(const LibPoint& other) const;
 
 	bool IsEqual(const LibPoint& other, double eps = 1e-9) const;
 
-	inline double X() const
+	inline T X() const
 	{
 		return m_x;
 	};
-	inline double Y() const
+	inline T Y() const
 	{
 		return m_y;
 	};
-	inline double Z() const
+	inline T Z() const
 	{
 		return m_z;
 	};
 
-	inline LibPoint& SetX(double x)
+	inline LibPoint& SetX(T x)
 	{
 		m_x = x;
 		return *this;
 	};
-	inline LibPoint& SetY(double y)
+	inline LibPoint& SetY(T y)
 	{
 		m_y = y;
 		return *this;
 	};
-	inline LibPoint& SetZ(double z)
+	inline LibPoint& SetZ(T z)
 	{
 		m_z = z;
 		return *this;
 	};
-	inline void SetXYZ(double x = 0.0, double y = 0.0, double z = 0.0)
+	inline void SetXYZ(T x = 0.0, T y = 0.0, T z = 0.0)
 	{
 		m_x = x;
 		m_y = y;
@@ -54,7 +54,7 @@ public:
 
 
 private:
-	double m_x;
-	double m_y;
-	double m_z;
+	T m_x;
+	T m_y;
+	T m_z;
 };

@@ -2,36 +2,51 @@
 
 #include "libPoint.h"
 
+template<typename T>
 class LibVector {
 public:
-	LibVector();
+	LibVector() = default;
 	LibVector(const LibPoint& pt_coordinates);
-	~LibVector();
+	~LibVector() = default;
 
 	inline const LibPoint& Coordinates() const
 	{
 		return m_pt_coord;
 	};
 
-	inline double X() const
+	inline T X() const
 	{
 		return m_pt_coord.X();
 	}
-	inline double Y() const
+	inline T Y() const
 	{
 		return m_pt_coord.Y();
 	}
-	inline double Z() const
+	inline T Z() const
 	{
 		return m_pt_coord.Z();
 	}
-
+	inline LibVector& SetX(T x)
+	{
+		m_pt_coord.SetX(x);
+		return *this;
+	}
+	inline LibVector& SetY(T y)
+	{
+		m_pt_coord.SetY(y);
+		return *this;
+	}
+	inline LibVector& SetZ(T z)
+	{
+		m_pt_coord.SetZ(z);
+		return *this;
+	}
 	inline void SetCoordinates(const LibPoint& coordinates)
 	{
 		m_pt_coord = coordinates;
 	};
 
-	LibVector operator*(double scalar);
+	LibVector operator*(T scalar);
 	LibVector operator+(const LibVector& other);
 	LibVector operator-(const LibVector& other);
 	bool operator==(const LibVector& other);
@@ -48,4 +63,5 @@ private:
 	LibPoint m_pt_coord;
 };
 
-LibVector operator*(double scalar, const LibVector& vec);
+template<typename T>
+LibVector<T> operator*(double scalar, const LibVector<T>& vec);
