@@ -6,7 +6,7 @@ template<typename T>
 class LibVector {
 public:
 	LibVector() = default;
-	LibVector(const LibPoint& ptCoordinates);
+	LibVector(const LibPoint<T>& ptCoordinates);
 	~LibVector() = default;
 
 	inline const LibPoint<T>& Coordinates() const
@@ -41,7 +41,7 @@ public:
 		m_PtCoord.SetZ(z);
 		return *this;
 	}
-	inline void SetCoordinates(const LibPoint& coordinates)
+	inline void SetCoordinates(const LibPoint<T>& coordinates)
 	{
 		m_PtCoord = coordinates;
 	}

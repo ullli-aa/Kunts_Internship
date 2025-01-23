@@ -1,6 +1,11 @@
 #pragma once
 
 #include "libVector.h"
+#include <cmath>
+
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 
 template <typename T>
 LibVector<T>::LibVector(const LibPoint<T>& ptCoordinates)
@@ -13,34 +18,34 @@ bool LibVector<T>::IsCollinear(const LibVector& other) const
 {
 	LibVector crossVec = CrossProduct(other);
 	return crossVec.X() <= 1e-9 &&
-		crossVec.Y() <= 1e-9 &&
-		crossVec.Z() <= 1e-9;
+		   crossVec.Y() <= 1e-9 &&
+		   crossVec.Z() <= 1e-9;
 }
 
 template <typename T>
 LibVector<T> LibVector<T>::operator*(T scalar)
 {
-	return LibVector(LibPoint(m_PtCoord.X() * scalar, m_PtCoord.Y() * scalar, m_PtCoord.Z() * scalar));
+	return LibVector(LibPoint<T>(m_PtCoord.X() * scalar, m_PtCoord.Y() * scalar, m_PtCoord.Z() * scalar));
 }
 
 template<typename T>
 LibVector<T> LibVector<T>::operator/(T scalar)
 {
-	return LibVector(LibPoint(m_PtCoord.X() / scalar, m_PtCoord.Y() / scalar, m_PtCoord.Z() / scalar));
+	return LibVector(LibPoint<T>(m_PtCoord.X() / scalar, m_PtCoord.Y() / scalar, m_PtCoord.Z() / scalar));
 }
 
 template <typename T>
 LibVector<T> LibVector<T>::operator+(const LibVector& other)
 {
-	LibPoint other_coord = other.m_PtCoord;
-	return LibVector(LibPoint(m_PtCoord.X() + other_coord.X(), m_PtCoord.Y() + other_coord.Y(), m_PtCoord.Z() + other_coord.Z()));
+	LibPoint<T> other_coord = other.m_PtCoord;
+	return LibVector(LibPoint<T>(m_PtCoord.X() + other_coord.X(), m_PtCoord.Y() + other_coord.Y(), m_PtCoord.Z() + other_coord.Z()));
 };
 
 template <typename T>
 LibVector<T> LibVector<T>::operator-(const LibVector& other)
 {
-	LibPoint other_coord = other.m_PtCoord;
-	return LibVector(LibPoint(m_PtCoord.X() - other_coord.X(), m_PtCoord.Y() - other_coord.Y(), m_PtCoord.Z() - other_coord.Z()));
+	LibPoint<T> other_coord = other.m_PtCoord;
+	return LibVector(LibPoint<T>(m_PtCoord.X() - other_coord.X(), m_PtCoord.Y() - other_coord.Y(), m_PtCoord.Z() - other_coord.Z()));
 }
 
 template <typename T>
@@ -65,7 +70,7 @@ bool LibVector<T>::IsEqual(const LibVector& other, double eps) const
 template <typename T>
 double LibVector<T>::LengthVector() const
 {
-	return m_PtCoord.DistanceTo(LibPoint(0, 0, 0));
+	return m_PtCoord.DistanceTo(LibPoint<T>(0, 0, 0));
 }
 
 template <typename T>
@@ -80,15 +85,15 @@ void LibVector<T>::Normalize()
 template <typename T>
 double LibVector<T>::DotProduct(const LibVector& other) const
 {
-	LibPoint other_coord = other.m_PtCoord;
+	LibPoint<T> other_coord = other.m_PtCoord;
 	return m_PtCoord.X() * other_coord.X() + m_PtCoord.Y() * other_coord.Y() + m_PtCoord.Z() * other_coord.Z();
 }
 
 template <typename T>
 LibVector<T> LibVector<T>::CrossProduct(const LibVector& other) const
 {
-	LibPoint other_coord = other.m_PtCoord;
-	return LibVector(LibPoint(
+	LibPoint<T> other_coord = other.m_PtCoord;
+	return LibVector(LibPoint<T>(
 		m_PtCoord.Y() * other_coord.Z() - m_PtCoord.Z() * other_coord.Y(),
 		-m_PtCoord.X() * other_coord.Z() + m_PtCoord.Z() * other_coord.X(),
 		m_PtCoord.X() * other_coord.Y() - m_PtCoord.Y() * other_coord.X()));
@@ -113,11 +118,11 @@ LibVector<T> LibVector<T>::Rotate2D(double angle) const
 	double radians = angle * (M_PI / 180.0);
 	double cosAngle = std::cos(radians);
 	double sinAngle = std::sin(radians);
-	return LibVector(LibPoint(X() * cosAngle - Y() * sinAngle, X() * sinAngle + Y() * cosAngle));
+	return LibVector(LibPoint<T>(X() * cosAngle - Y() * sinAngle, X() * sinAngle + Y() * cosAngle));
 }
 
 template <typename T>
 LibVector<T> operator*(double scalar, const LibVector<T>& vec)
 {
-	return LibVector();
+	return LibVector<T>(LibPoint<T>(vec.m_PtCoord.X() * scalar, vec.m_PtCoord.Y() * scalar, vec.m_PtCoord.Z() * scalar));
 }
