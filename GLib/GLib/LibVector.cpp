@@ -100,6 +100,13 @@ LibVector<T> LibVector<T>::CrossProduct(const LibVector& other) const
 }
 
 template<typename T>
+double LibVector<T>::TripleProduct(const LibVector& first, const LibVector& second) const
+{
+	auto crossVec = CrossProduct(first);
+	return second.DotProduct(crossVec);
+}
+
+template<typename T>
 T LibVector<T>::AngleBetweenVec(const LibVector& other) const
 {
 	T dotProduct = DotProduct(other);
@@ -110,6 +117,18 @@ template<typename T>
 T LibVector<T>::DistBetweenVec(const LibVector& other) const
 {
 	return m_PtCoord.DistanceTo(other.m_PtCoord);
+}
+
+template<typename T>
+bool LibVector<T>::IsOrtogonal(const LibVector& other) const
+{
+	return DotProduct(other) <= 1e-9;
+}
+
+template<typename T>
+LibPoint<T>& LibVector<T>::IsIntersection(const LibVector& other) const
+{
+	
 }
 
 template<typename T>

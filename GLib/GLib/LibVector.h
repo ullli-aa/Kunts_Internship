@@ -60,9 +60,13 @@ public:
 
 	double DotProduct(const LibVector& other) const;
 	LibVector<T> CrossProduct(const LibVector& other) const;
+	double TripleProduct(const LibVector& first, const LibVector& second) const;
 
 	T AngleBetweenVec(const LibVector& other) const;
 	T DistBetweenVec(const LibVector& other) const;
+
+	bool IsOrtogonal(const LibVector& other) const;
+	LibPoint<T>& IsIntersection(const LibVector& other) const;
 
 	LibVector<T> Rotate2D(double angle) const;
 
