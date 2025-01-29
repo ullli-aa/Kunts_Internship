@@ -126,6 +126,12 @@ bool LibVector<T>::IsOrtogonal(const LibVector& other) const
 }
 
 template<typename T>
+bool LibVector<T>::IsOpposite(const LibVector& other) const
+{
+	return AngleBetweenVec(other) == -1;
+}
+
+template<typename T>
 LibPoint<T>& LibVector<T>::IsIntersection(const LibVector& other) const
 {
 	

@@ -27,6 +27,9 @@
     <ClCompile Include="LibVector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LibLine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LibPoint.h">
@@ -36,6 +39,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LibVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibLine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

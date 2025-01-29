@@ -66,6 +66,7 @@ public:
 	T DistBetweenVec(const LibVector& other) const;
 
 	bool IsOrtogonal(const LibVector& other) const;
+	bool IsOpposite(const LibVector& other) const;
 	LibPoint<T>& IsIntersection(const LibVector& other) const;
 
 	LibVector<T> Rotate2D(double angle) const;
