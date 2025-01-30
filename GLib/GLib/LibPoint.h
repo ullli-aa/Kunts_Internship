@@ -14,6 +14,8 @@ public:
 
 	bool operator==(const LibPoint& other) const;
 	bool operator!=(const LibPoint& other) const;
+	LibPoint operator+(const LibPoint& other) const;
+	LibPoint operator-(const LibPoint& other) const;
 
 	bool IsEqual(const LibPoint& other, double eps = 1e-9) const;
 

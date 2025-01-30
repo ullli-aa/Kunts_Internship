@@ -67,6 +67,12 @@ bool LibVector<T>::IsEqual(const LibVector& other, double eps) const
 		   std::fabs(LengthVector() - other.LengthVector()) <= 1e-9;
 }
 
+template<typename T>
+bool LibVector<T>::IsZero() const
+{
+	return X <= 1e-9 && Y <= 1e-9 && Z <= 1e-9;
+}
+
 template <typename T>
 double LibVector<T>::LengthVector() const
 {
@@ -74,12 +80,13 @@ double LibVector<T>::LengthVector() const
 }
 
 template <typename T>
-void LibVector<T>::Normalize()
+LibVector<T>& LibVector<T>::Normalize()
 {
 	double length = LengthVector();
 	if (length != 0) {
 		m_PtCoord.SetXYZ(m_PtCoord.X() / length, m_PtCoord.Y() / length, m_PtCoord.Z() / length);
 	}
+	return *this;
 }
 
 template <typename T>
@@ -129,12 +136,6 @@ template<typename T>
 bool LibVector<T>::IsOpposite(const LibVector& other) const
 {
 	return AngleBetweenVec(other) == -1;
-}
-
-template<typename T>
-LibPoint<T>& LibVector<T>::IsIntersection(const LibVector& other) const
-{
-	
 }
 
 template<typename T>

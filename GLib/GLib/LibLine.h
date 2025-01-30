@@ -33,6 +33,8 @@ public:
 	bool IsOpposite(const LibLine& lnOther) const;
 
 	virtual bool IsIntersection(const LibLine& lnOther) const;
+	virtual LibPoint& ClosestPointOnLine(const LibPoint& point) const;
+	virtual bool IsPointOnLine(const LibPoint& point) const;
 private:
 	LibPoint<T> m_ptOrigin;
 	LibVector<T> m_ptDirection;

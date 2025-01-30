@@ -37,7 +37,17 @@ template<typename T>
 bool LibPoint<T>::operator!=(const LibPoint& other) const
 {
 	return !(*this == other);
-};
+}
+template<typename T>
+LibPoint<T> LibPoint<T>::operator+(const LibPoint& other) const
+{
+	return LibPoint(m_x + other.X, m_y + other.Y, m_z + other.Z);
+}
+template<typename T>
+LibPoint<T> LibPoint<T>::operator-(const LibPoint& other) const
+{
+	return LibPoint(m_x - other.X, m_y - other.Y, m_z - other.Z);
+}
 
 template<typename T>
 bool LibPoint<T>::IsEqual(const LibPoint& other, double eps) const

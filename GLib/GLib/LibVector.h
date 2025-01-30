@@ -54,9 +54,10 @@ public:
 	bool operator==(const LibVector& other);
 	bool operator!=(const LibVector& other);
 	bool IsEqual(const LibVector& other, double eps = 1e-9) const;
+	bool IsZero() const;
 
 	double LengthVector() const;
-	void Normalize();
+	LibVector<T>& Normalize();
 
 	double DotProduct(const LibVector& other) const;
 	LibVector<T> CrossProduct(const LibVector& other) const;
@@ -67,7 +68,6 @@ public:
 
 	bool IsOrtogonal(const LibVector& other) const;
 	bool IsOpposite(const LibVector& other) const;
-	LibPoint<T>& IsIntersection(const LibVector& other) const;
 
 	LibVector<T> Rotate2D(double angle) const;
 
