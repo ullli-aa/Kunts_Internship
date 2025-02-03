@@ -1,4 +1,5 @@
 #include "LibLine.h"
+#include <cmath>
 
 template<typename T>
 LibLine<T>::LibLine(LibPoint<T> ptOrigin, LibVector<T> ptDirection)
@@ -34,26 +35,25 @@ bool LibLine<T>::IsOpposite(const LibLine& lnOther) const
 template<typename T>
 bool LibLine<T>::IsSkew(const LibLine<T>& lnOther) const
 {
-	auto inters = IsIntersection(lnOther);
-	return !IsParallel(lnOther) && std::holds_alternative<LibPoint<T>>(inters);
+	auto inters = IsIntersectionLine(lnOther);
+	return !IsParallel(lnOther) && std::holds_alternative<bool>(inters);
 }
 
 template<typename T>
-std::variant<LibPoint<T>, bool> LibLine<T>::IsIntersection(const LibLine& lnOther) const
+std::variant<LibPoint<T>, bool> LibLine<T>::IsIntersectionLine(const LibLine& lnOther) const
 {
 	if (IsParallel(lnOther)) {
 		return false;
 	}
 
-	LibVector<T> vecCrossd1d2 = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
-	LibVector<T> vecCrossd2d1 = lnOther.m_ptDirection.CrossProduct(m_ptDirection);
+	LibVector<T> vecCross = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
 
 	LibVector<T> vec = LibVector<T>(LibPoint<T>(m_ptOrigin.X() - lnOther.m_ptOrigin.X(),
 		m_ptOrigin.Y() - lnOther.m_ptOrigin.Y(),
-		m_ptOrigin.Z() - lnOther.m_ptOrigin.Z();
+		m_ptOrigin.Z() - lnOther.m_ptOrigin.Z()));
 
-	double coef1 = vec.DotProduct(vecCrossd2d1) / (m_ptDirection.DotProduct(vecCrossd2d1);
-	double coef2 = vec.DotProduct(vecCrossd1d2) / (lnOther.m_ptDirection.DotProduct(vecCrossd1d2);
+	double coef1 = vec.CrossProduct(lnOther.m_ptDirection) / vecCross;
+	double coef2 = vec.CrossProduct(m_ptDirection) / vecCross;
 
 	LibVector<T> inters1 = LibVector(m_ptOrigin) + coef1 * m_ptDirection;
 	LibVector<T> inters2 = LibVector(lnOther.m_ptOrigin) + coef2 * lnOther.m_ptDirection;
@@ -70,13 +70,13 @@ template<typename T>
 LibPoint<T> LibLine<T>::ClosestPointOnLine(const LibPoint<T>& point) const
 {
 	LibVector<T> vec = LibVector<T>(point - m_ptOrigin);
-	double coef = vec.DotProduct(m_ptDirection) / m_ptDirection.DotProduct(m_ptDirection);
+	double coef = vec.DotProduct(m_ptDirection.Normalize());
 	LibVector<T> scalDir = coef * m_ptDirection;
 	return m_ptOrigin + scalDir.Coordinates();
 }
 
 template<typename T>
-bool LibLine<T>::IsPointOnLine(const LibPoint<T>& point)
+bool LibLine<T>::IsPointOnLine(const LibPoint<T>& point) const
 {
 	LibVector<T> vec = LibVector<T>(point - m_ptOrigin);
 
@@ -87,4 +87,23 @@ bool LibLine<T>::IsPointOnLine(const LibPoint<T>& point)
 	vec.Normalize();
 
 	return vec.IsZero() || std::fabs(vec.DotProduct(m_ptDirection) - 1) <= 1e-9;
+}
+
+template<typename T>
+double LibLine<T>::DistBetweenLines(const LibLine<T>& lnOther) const
+{
+	if (std::holds_alternative<LibPoint<T>>(IsIntersectionLine(lnOther))) {
+		return 0;
+	}
+	if (IsParallel(lnOther)) {
+		LibPoint<T> closestPoint = ClosestPointOnLine(lnOther.Origin());
+		LibVector<T> dist = LibVector<T>(m_ptOrigin - closestPoint);
+		return dist.LengthVector();
+	}
+
+	LibVector<T> vec = LibVector<T>(lnOther.Origin() - m_ptOrigin);
+	LibVector<T> vecCross = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
+
+
+	return vec.DotProduct(vecCross) / vecCross.LengthVector();
 }

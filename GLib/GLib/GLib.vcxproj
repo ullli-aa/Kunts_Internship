@@ -143,12 +143,14 @@
     <ClCompile Include="GLib.cpp" />
     <ClCompile Include="LibLine.cpp" />
     <ClCompile Include="LibPoint.cpp" />
+    <ClCompile Include="LibRay.cpp" />
     <ClCompile Include="LibUtility.cpp" />
     <ClCompile Include="LibVector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LibLine.h" />
     <ClInclude Include="LibPoint.h" />
+    <ClInclude Include="LibRay.h" />
     <ClInclude Include="LibUtility.h" />
     <ClInclude Include="LibVector.h" />
   </ItemGroup>

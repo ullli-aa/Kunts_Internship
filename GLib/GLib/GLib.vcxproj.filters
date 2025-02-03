@@ -30,6 +30,9 @@
     <ClCompile Include="LibLine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LibRay.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LibPoint.h">
@@ -42,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LibLine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LibRay.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
