@@ -1,6 +1,7 @@
 #pragma once
 
 #include "libPoint.h"
+#include "LibEps.h"
 
 template<typename T>
 class LibVector {
@@ -26,17 +27,17 @@ public:
 	{
 		return m_PtCoord.Z();
 	}
-	inline LibVector& SetX(T x)
+	inline const LibVector& SetX(T x)
 	{
 		m_PtCoord.SetX(x);
 		return *this;
 	}
-	inline LibVector& SetY(T y)
+	inline const LibVector& SetY(T y)
 	{
 		m_PtCoord.SetY(y);
 		return *this;
 	}
-	inline LibVector& SetZ(T z)
+	inline const LibVector& SetZ(T z)
 	{
 		m_PtCoord.SetZ(z);
 		return *this;
@@ -46,25 +47,26 @@ public:
 		m_PtCoord = coordinates;
 	}
 
-	bool IsCollinear(const LibVector& other) const;
+	bool IsParallel(const LibVector& other) const;
 	LibVector<T> operator*(T scalar);
 	LibVector<T> operator/(T scalar);
 	LibVector<T> operator+(const LibVector& other);
 	LibVector<T> operator-(const LibVector& other);
 	bool operator==(const LibVector& other);
 	bool operator!=(const LibVector& other);
-	bool IsEqual(const LibVector& other, double eps = 1e-9) const;
+	bool IsEqual(const LibVector& other, double eps = LibEps::eps) const;
 	bool IsZero() const;
 
 	double LengthVector() const;
-	LibVector<T>& Normalize();
+	LibVector<T>& NormalizeThis();
+	LibVector<T> GetNormalize() const;
 
 	double DotProduct(const LibVector& other) const;
 	LibVector<T> CrossProduct(const LibVector& other) const;
 	double TripleProduct(const LibVector& first, const LibVector& second) const;
 
 	T AngleBetweenVec(const LibVector& other) const;
-	T DistBetweenVec(const LibVector& other) const;
+	T AngleTo(const LibVector& vec2, const LibVector& vecDir) const;
 
 	bool IsOrtogonal(const LibVector& other) const;
 	bool IsOpposite(const LibVector& other) const;

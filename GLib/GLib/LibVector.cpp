@@ -2,10 +2,7 @@
 
 #include "libVector.h"
 #include <cmath>
-
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include <math.h>
 
 template <typename T>
 LibVector<T>::LibVector(const LibPoint<T>& ptCoordinates)
@@ -14,12 +11,12 @@ LibVector<T>::LibVector(const LibPoint<T>& ptCoordinates)
 }
 
 template<typename T>
-bool LibVector<T>::IsCollinear(const LibVector& other) const
+bool LibVector<T>::IsParallel(const LibVector& other) const
 {
 	LibVector crossVec = CrossProduct(other);
-	return crossVec.X() <= 1e-9 &&
-		   crossVec.Y() <= 1e-9 &&
-		   crossVec.Z() <= 1e-9;
+	return crossVec.X() <= LibEps::eps &&
+		crossVec.Y() <= LibEps::eps &&
+		crossVec.Z() <= LibEps::eps;
 }
 
 template <typename T>
@@ -51,40 +48,54 @@ LibVector<T> LibVector<T>::operator-(const LibVector& other)
 template <typename T>
 bool LibVector<T>::operator==(const LibVector& other)
 {
-	return IsEqual(other, 1e-9);
+	return IsEqual(other, LibEps::eps);
 }
 
 template <typename T>
 bool LibVector<T>::operator!=(const LibVector& other)
 {
-	return m_PtCoord != other.m_PtCoord;;
+	return !(m_PtCoord == other.m_PtCoord);
 }
 
 template <typename T>
 bool LibVector<T>::IsEqual(const LibVector& other, double eps) const
 {
-	return IsCollinear(other) &&
-		   std::fabs(LengthVector() - other.LengthVector()) <= 1e-9;
+	return IsParallel(other) &&
+		std::fabs(LengthVector() - other.LengthVector()) <= eps;
 }
 
 template<typename T>
 bool LibVector<T>::IsZero() const
 {
-	return X <= 1e-9 && Y <= 1e-9 && Z <= 1e-9;
+	return X <= LibEps::eps && Y <= LibEps::eps && Z <= LibEps::eps;
 }
 
 template <typename T>
 double LibVector<T>::LengthVector() const
 {
-	return m_PtCoord.DistanceTo(LibPoint<T>(0, 0, 0));
+	return std::sqrt(m_PtCoord.m_x * m_PtCoord.m_x +
+		m_PtCoord.m_y * m_PtCoord.m_y +
+		m_PtCoord.m_z * m_PtCoord.m_z);
 }
 
 template <typename T>
-LibVector<T>& LibVector<T>::Normalize()
+LibVector<T>& LibVector<T>::NormalizeThis()
 {
 	double length = LengthVector();
-	if (length != 0) {
+	if (!IsZero())
+	{
 		m_PtCoord.SetXYZ(m_PtCoord.X() / length, m_PtCoord.Y() / length, m_PtCoord.Z() / length);
+	}
+	return *this;
+}
+
+template<typename T>
+LibVector<T> LibVector<T>::GetNormalize() const
+{
+	double length = LengthVector();
+	if (!IsZero())
+	{
+		return LibVector<T>(LibPoint<T>(m_PtCoord.X() / length, m_PtCoord.Y() / length, m_PtCoord.Z() / length));
 	}
 	return *this;
 }
@@ -116,26 +127,33 @@ double LibVector<T>::TripleProduct(const LibVector& first, const LibVector& seco
 template<typename T>
 T LibVector<T>::AngleBetweenVec(const LibVector& other) const
 {
+	LibVector<T> vecCross = CrossProduct(other);
 	T dotProduct = DotProduct(other);
-	return dotProduct / (LengthVector * other.LengthVector);
+	return std::acos(dotProduct / (LengthVector() * other.LengthVector()));
 }
 
 template<typename T>
-T LibVector<T>::DistBetweenVec(const LibVector& other) const
+T LibVector<T>::AngleTo(const LibVector& vec2, const LibVector& vecDir) const
 {
-	return m_PtCoord.DistanceTo(other.m_PtCoord);
+	auto val = AngleBetweenVec(vec2);
+	if (!vecDir.IsOpposite(CrossProduct(vec2)))
+	{
+		return val;
+	}
+
+	return 2 * M_PI - val;
 }
 
 template<typename T>
 bool LibVector<T>::IsOrtogonal(const LibVector& other) const
 {
-	return DotProduct(other) <= 1e-9;
+	return DotProduct(other) <= LibEps::eps;
 }
 
 template<typename T>
 bool LibVector<T>::IsOpposite(const LibVector& other) const
 {
-	return AngleBetweenVec(other) == -1;
+	return DotProduct(other) < 0;
 }
 
 template<typename T>

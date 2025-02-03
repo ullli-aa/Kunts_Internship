@@ -148,6 +148,7 @@
     <ClCompile Include="LibVector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LibEps.h" />
     <ClInclude Include="LibLine.h" />
     <ClInclude Include="LibPoint.h" />
     <ClInclude Include="LibRay.h" />

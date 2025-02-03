@@ -3,7 +3,7 @@
 #include <cmath>
 
 template<typename T>
-std::variant<LibPoint<T>, bool> LibRay<T>::IsIntersectionLine(const LibLine<T>& lnOther) const
+bool LibRay<T>::IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& interPoint) const
 {
 	if (IsParallel(lnOther)) {
 		return false;
@@ -25,16 +25,16 @@ std::variant<LibPoint<T>, bool> LibRay<T>::IsIntersectionLine(const LibLine<T>& 
 	LibVector<T> inters1 = LibVector(this->m_ptOrigin) + coefR * this->m_ptDirection;
 	LibVector<T> inters2 = LibVector(lnOther.Origin()) + coefL * lnOther->Direction();
 
-	if (std::fabs(inters1.X() - inters2.X()) <= 1e-9 &&
-		std::fabs(inters1.Y() - inters2.Y()) <= 1e-9 &&
-		std::fabs(inters1.Z() - inters2.Z()) <= 1e-9) {
+	if (std::fabs(inters1.X() - inters2.X()) <= LibEps::eps &&
+		std::fabs(inters1.Y() - inters2.Y()) <= LibEps::eps &&
+		std::fabs(inters1.Z() - inters2.Z()) <= LibEps::eps) {
 		return LibPoint<T>(inters1.X(), inters1.Y(), inters1.Z());
 	}
 	return false;
 }
 
 template<typename T>
-std::variant<LibPoint<T>, bool> LibRay<T>::IsIntersectionRay(const LibRay<T>& rayOther) const
+bool LibRay<T>::IsIntersectionRay(const LibRay<T>& rayOther, LibPoint<T>& interPoint) const
 {
 	if (IsParallel(rayOther)) {
 		return false;
@@ -50,7 +50,7 @@ std::variant<LibPoint<T>, bool> LibRay<T>::IsIntersectionRay(const LibRay<T>& ra
 	double denom1 = this->m_ptDirection.DotProduct(vecCrossd2d1);
 	double denom2 = rayOther.m_ptDirection.DotProduct(vecCrossd1d2);
 
-	if (std::fabs(denom1) <= 1e-9 || std::fabs(denom2) <= 1e-9) {
+	if (std::fabs(denom1) <= LibEps::eps || std::fabs(denom2) <= LibEps::eps) {
 		return false;
 	}
 
@@ -61,9 +61,9 @@ std::variant<LibPoint<T>, bool> LibRay<T>::IsIntersectionRay(const LibRay<T>& ra
 		LibPoint<T> inters1 = this->m_ptOrigin + coef1 * this->m_ptDirection.Coordinates();
 		LibPoint<T> inters2 = rayOther.m_ptOrigin + coef2 * rayOther.m_ptDirection.Coordinates();
 
-		if (std::fabs(inters1.X() - inters2.X()) <= 1e-9 &&
-			std::fabs(inters1.Y() - inters2.Y()) <= 1e-9 &&
-			std::fabs(inters1.Z() - inters2.Z()) <= 1e-9) {
+		if (std::fabs(inters1.X() - inters2.X()) <= LibEps::eps &&
+			std::fabs(inters1.Y() - inters2.Y()) <= LibEps::eps &&
+			std::fabs(inters1.Z() - inters2.Z()) <= LibEps::eps) {
 			return LibPoint<T>(inters1.X(), inters1.Y(), inters1.Z());
 		}
 	}
