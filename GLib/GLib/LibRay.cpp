@@ -3,68 +3,27 @@
 #include <cmath>
 
 template<typename T>
-bool LibRay<T>::IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& interPoint) const
+bool LibRay<T>::IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& intersPoint) const
 {
-	if (IsParallel(lnOther)) {
-		return false;
-	}
-
-	LibVector<T> vec = LibVector<T>(LibPoint<T>(this->m_ptOrigin.X() - lnOther.Origin().X(),
-		this->m_ptOrigin.Y() - lnOther.Origin().Y(),
-		this->m_ptOrigin.Z() - lnOther.Origin().Z()));
-
-	LibVector<T> vecCross = this->m_ptDirection.CrossProduct(lnOther.Direction());
-
-	double coefR = vec.CrossProduct(this->m_ptDirection) / vecCross;
-	double coefL = vec.CrossProduct(lnOther.Direction()) / vecCross;
-
-	if (coefR < 0) {
-		return false;
-	}
-
-	LibVector<T> inters1 = LibVector(this->m_ptOrigin) + coefR * this->m_ptDirection;
-	LibVector<T> inters2 = LibVector(lnOther.Origin()) + coefL * lnOther->Direction();
-
-	if (std::fabs(inters1.X() - inters2.X()) <= LibEps::eps &&
-		std::fabs(inters1.Y() - inters2.Y()) <= LibEps::eps &&
-		std::fabs(inters1.Z() - inters2.Z()) <= LibEps::eps) {
-		return LibPoint<T>(inters1.X(), inters1.Y(), inters1.Z());
+	double coefR, coefL;
+	if (GetIntersParam(lnOther, coefR, coefL))
+	{
+		if (coefR < 0) {
+			return false;
+		}
+		return GetIntersection(coefR);
 	}
 	return false;
 }
 
 template<typename T>
-bool LibRay<T>::IsIntersectionRay(const LibRay<T>& rayOther, LibPoint<T>& interPoint) const
+bool LibRay<T>::IsIntersectionRay(const LibRay<T>& rayOther, LibPoint<T>& intersPoint) const
 {
-	if (IsParallel(rayOther)) {
-		return false;
-	}
-
-	LibVector<T> vecCrossd1d2 = this->m_ptDirection.CrossProduct(rayOther.m_ptDirection);
-	LibVector<T> vecCrossd2d1 = rayOther.m_ptDirection.CrossProduct(this->m_ptDirection);
-
-	LibVector<T> vec = LibVector<T>(LibPoint<T>(this->m_ptOrigin.X() - rayOther.m_ptOrigin.X(),
-		this->m_ptOrigin.Y() - rayOther.m_ptOrigin.Y(),
-		this->m_ptOrigin.Z() - rayOther.m_ptOrigin.Z()));
-
-	double denom1 = this->m_ptDirection.DotProduct(vecCrossd2d1);
-	double denom2 = rayOther.m_ptDirection.DotProduct(vecCrossd1d2);
-
-	if (std::fabs(denom1) <= LibEps::eps || std::fabs(denom2) <= LibEps::eps) {
-		return false;
-	}
-
-	double coef1 = vec.DotProduct(vecCrossd2d1) / denom1;
-	double coef2 = vec.DotProduct(vecCrossd1d2) / denom2;
-
-	if (coef1 >= 0 && coef2 >= 0) {
-		LibPoint<T> inters1 = this->m_ptOrigin + coef1 * this->m_ptDirection.Coordinates();
-		LibPoint<T> inters2 = rayOther.m_ptOrigin + coef2 * rayOther.m_ptDirection.Coordinates();
-
-		if (std::fabs(inters1.X() - inters2.X()) <= LibEps::eps &&
-			std::fabs(inters1.Y() - inters2.Y()) <= LibEps::eps &&
-			std::fabs(inters1.Z() - inters2.Z()) <= LibEps::eps) {
-			return LibPoint<T>(inters1.X(), inters1.Y(), inters1.Z());
+	double coef1, coef2;
+	if (GetIntersParam(lnOther, coefR, coefL))
+	{
+		if (coef1 >= 0 && coef2 >= 0) {
+			return GetIntersection(coef2);
 		}
 	}
 	return false;

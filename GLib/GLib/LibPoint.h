@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LibVector.h"
+
 template<typename T>
 class LibPoint {
 public:
@@ -14,8 +16,14 @@ public:
 
 	bool operator==(const LibPoint& other) const;
 	bool operator!=(const LibPoint& other) const;
-	LibPoint operator+(const LibPoint& other) const;
-	LibPoint operator-(const LibPoint& other) const;
+	LibPoint operator+(const LibVector& other) const
+	{
+		return LibPoint<T>(m_x + other.X(), m_y + other.Y(), m_z + other.Z());
+	}
+	LibVector operator-(const LibPoint& other) const
+	{
+		return LibVector<T>(m_x - other.X, m_y - other.Y, m_z - other.Z);
+	}
 
 	bool IsEqual(const LibPoint& other, double eps = 1e-9) const;
 

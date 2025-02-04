@@ -2,7 +2,13 @@
 
 class LibEps
 {
-	static const double eps;
+public:
+	static double eps;
+
+	bool IsZero(double numb, double otherEps = eps)
+	{
+		return numb <= otherEps;
+	}
 };
 
-const double eps = 1e-9;
+double LibEps::eps = 1e-9;

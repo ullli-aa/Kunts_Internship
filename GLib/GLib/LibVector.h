@@ -1,6 +1,6 @@
 #pragma once
 
-#include "libPoint.h"
+#include "LibPoint.h"
 #include "LibEps.h"
 
 template<typename T>
@@ -47,7 +47,7 @@ public:
 		m_PtCoord = coordinates;
 	}
 
-	bool IsParallel(const LibVector& other) const;
+	bool IsParallel(const LibVector& other, double eps = LibEps::eps) const;
 	LibVector<T> operator*(T scalar);
 	LibVector<T> operator/(T scalar);
 	LibVector<T> operator+(const LibVector& other);
@@ -68,7 +68,7 @@ public:
 	T AngleBetweenVec(const LibVector& other) const;
 	T AngleTo(const LibVector& vec2, const LibVector& vecDir) const;
 
-	bool IsOrtogonal(const LibVector& other) const;
+	bool IsOrtogonal(const LibVector& other, double eps = LibEps::eps) const;
 	bool IsOpposite(const LibVector& other) const;
 
 	LibVector<T> Rotate2D(double angle) const;

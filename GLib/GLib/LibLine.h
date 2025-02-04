@@ -34,7 +34,10 @@ public:
 	bool IsOpposite(const LibLine<T>& lnOther) const;
 	bool IsSkew(const LibLine<T>& lnOther) const;
 
-	virtual bool IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& interPoint) const;
+	bool GetIntersParam(const LibLine<T>& lnOther, double& coef1, double& coef2) const;
+	bool GetIntersection(double coef, LibPoint<T>& intersPoint);
+
+	virtual bool IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& intersPoint) const;
 	virtual LibPoint<T> ClosestPointOnLine(const LibPoint<T>& point) const;
 	virtual bool IsPointOnLine(const LibPoint<T>& point) const;
 

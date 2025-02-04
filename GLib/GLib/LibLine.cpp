@@ -35,12 +35,12 @@ bool LibLine<T>::IsOpposite(const LibLine& lnOther) const
 template<typename T>
 bool LibLine<T>::IsSkew(const LibLine<T>& lnOther) const
 {
-	auto inters = IsIntersectionLine(lnOther);
-	return !IsParallel(lnOther) && std::holds_alternative<bool>(inters);
+	bool inters = IsIntersectionLine(lnOther);
+	return !IsParallel(lnOther) && !inters;
 }
 
 template<typename T>
-bool LibLine<T>::IsIntersectionLine(const LibLine& lnOther, LibPoint<T>& interPoint) const
+bool LibLine<T>::GetIntersParam(const LibLine<T>& lnOther, double& coef1, double& coef2) const
 {
 	if (IsParallel(lnOther)) {
 		return false;
@@ -48,20 +48,27 @@ bool LibLine<T>::IsIntersectionLine(const LibLine& lnOther, LibPoint<T>& interPo
 
 	LibVector<T> vecCross = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
 
-	LibVector<T> vec = LibVector<T>(LibPoint<T>(m_ptOrigin.X() - lnOther.m_ptOrigin.X(),
-		m_ptOrigin.Y() - lnOther.m_ptOrigin.Y(),
-		m_ptOrigin.Z() - lnOther.m_ptOrigin.Z()));
+	LibVector<T> vec = m_ptOrigin - lnOther.m_ptOrigin;
 
-	double coef1 = vec.CrossProduct(lnOther.m_ptDirection) / vecCross;
-	double coef2 = vec.CrossProduct(m_ptDirection) / vecCross;
+	coef1 = vec.CrossProduct(m_ptDirection) / vecCross;
+	coef2 = vec.CrossProduct(lnOther.Direction()) / vecCross;
+	return true;
+}
 
-	LibVector<T> inters1 = LibVector(m_ptOrigin) + coef1 * m_ptDirection;
-	LibVector<T> inters2 = LibVector(lnOther.m_ptOrigin) + coef2 * lnOther.m_ptDirection;
+template<typename T>
+bool LibLine<T>::GetIntersection(double coef, LibPoint<T>& intersPoint)
+{
+	intersPoint = m_ptOrigin + coef * m_ptDirection;
+	return true;
+}
 
-	if (std::fabs(inters1.X() - inters2.X()) <= LibEps::eps &&
-		std::fabs(inters1.Y() - inters2.Y())<= LibEps::eps &&
-		std::fabs(inters1.Z() - inters2.Z()) <= LibEps::eps) {
-		interPoint = LibPoint<T>(inters1.X(), inters1.Y(), inters1.Z());
+template<typename T>
+bool LibLine<T>::IsIntersectionLine(const LibLine& lnOther, LibPoint<T>& intersPoint) const
+{
+	double coef1, coef2;
+	if (GetIntersParam(lnOther, coef1, coef2))
+	{
+		return GetIntersection(coef2);
 	}
 	return false;
 }
@@ -92,7 +99,7 @@ bool LibLine<T>::IsPointOnLine(const LibPoint<T>& point) const
 template<typename T>
 double LibLine<T>::DistBetweenLines(const LibLine<T>& lnOther) const
 {
-	if (std::holds_alternative<LibPoint<T>>(IsIntersectionLine(lnOther))) {
+	if (IsIntersectionLine(lnOther)) {
 		return 0;
 	}
 	if (IsParallel(lnOther)) {
@@ -101,8 +108,8 @@ double LibLine<T>::DistBetweenLines(const LibLine<T>& lnOther) const
 		return dist.LengthVector();
 	}
 
-	LibVector<T> vec = LibVector<T>(lnOther.Origin() - m_ptOrigin);
-	LibVector<T> vecCross = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
+	//LibVector<T> vec = LibVector<T>(lnOther.Origin() - m_ptOrigin);
+	//LibVector<T> vecCross = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
 
 	return vec.DotProduct(vecCross) / vecCross.LengthVector();
 }

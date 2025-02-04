@@ -53,5 +53,8 @@
     <ClInclude Include="LibEps.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibSegment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

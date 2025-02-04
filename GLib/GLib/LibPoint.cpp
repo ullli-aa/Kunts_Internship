@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cmath>
-#include "libPoint.h"
-#include "libUtility.h"
+#include "LibPoint.h"
+#include "LibUtility.h"
 
 template<typename T>
 LibPoint<T>::LibPoint() : m_x(0.0), m_y(0.0), m_z(0.0) {}
@@ -30,23 +30,13 @@ T LibPoint<T>::DistanceTo(const LibPoint& other) const
 template<typename T>
 bool LibPoint<T>::operator==(const LibPoint& other) const
 {
-	return SquareDistanceTo(other) <= 1e-9;
+	return LibEps::IsZero(SquareDistanceTo(other));
 };
 
 template<typename T>
 bool LibPoint<T>::operator!=(const LibPoint& other) const
 {
 	return !(*this == other);
-}
-template<typename T>
-LibPoint<T> LibPoint<T>::operator+(const LibPoint& other) const
-{
-	return LibPoint(m_x + other.X, m_y + other.Y, m_z + other.Z);
-}
-template<typename T>
-LibPoint<T> LibPoint<T>::operator-(const LibPoint& other) const
-{
-	return LibPoint(m_x - other.X, m_y - other.Y, m_z - other.Z);
 }
 
 template<typename T>
