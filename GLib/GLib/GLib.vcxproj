@@ -141,6 +141,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GLib.cpp" />
+    <ClCompile Include="LibEps.cpp" />
     <ClCompile Include="LibLine.cpp" />
     <ClCompile Include="LibPoint.cpp" />
     <ClCompile Include="LibRay.cpp" />

@@ -14,7 +14,7 @@ public:
 
 	bool IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& intersPoint) const override
 	{
-		double coefL, coefS;
+		T coefL, coefS;
 		if (GetIntersParam(lnOther, coefL, coefS))
 		{
 			if (coefS < 0 || coefS > 1)
@@ -29,7 +29,7 @@ public:
 
 	bool IsIntersectionRay(const LibRay<T>& rayOther, LibPoint<T>& intersPoint) const
 	{
-		double coefR, coefS;
+		T coefR, coefS;
 		if (GetIntersParam(rayOther, coefR, coefS))
 		{
 			if ((coefS < 0 || coefS > 1) && coefR < 0)
@@ -43,7 +43,7 @@ public:
 
 	bool IsIntersectionSegment(const LibRay<T>& sgmntOther, LibPoint<T>& intersPoint) const
 	{
-		double coef1, coef2;
+		T coef1, coef2;
 		if (GetIntersParam(rayOther, coef1, coef2))
 		{
 			if (coef2 < 0 || coef2 > 1 || coef1 < 0 || coef1 > 1)

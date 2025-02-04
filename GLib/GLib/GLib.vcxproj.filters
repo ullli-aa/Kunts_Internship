@@ -33,6 +33,9 @@
     <ClCompile Include="LibRay.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LibEps.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LibPoint.h">

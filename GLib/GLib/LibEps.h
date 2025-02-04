@@ -10,5 +10,3 @@ public:
 		return numb <= otherEps;
 	}
 };
-
-double LibEps::eps = 1e-9;
