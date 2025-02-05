@@ -1,56 +1,46 @@
 #pragma once
 
-#include "LibPoint.h"
 #include "LibEps.h"
 #include <cmath>
-#include <math.h>
+#include <numbers>
+
+double M_PI = std::numbers::pi;
 
 template<typename T>
 class LibVector
 {
 public:
 	LibVector() = default;
-	LibVector(const LibPoint<T>& ptCoordinates)
-	{
-		m_PtCoord = ptCoordinates;
-	};
+	LibVector(T x, T y) : m_x(x), m_y(y) {};
+	LibVector(T x, T y, T z) : m_x(x), m_y(y), m_z(z) {};
 	~LibVector() = default;
-
-	inline const LibPoint<T>& Coordinates() const
-	{
-		return m_PtCoord;
-	};
 
 	inline T X() const
 	{
-		return m_PtCoord.X();
+		return m_x;
 	}
 	inline T Y() const
 	{
-		return m_PtCoord.Y();
+		return m_y;
 	}
 	inline T Z() const
 	{
-		return m_PtCoord.Z();
+		return m_z;
 	}
-	inline const LibVector<T>& SetX(T x)
+	inline LibVector<T>& SetX(T x)
 	{
-		m_PtCoord.SetX(x);
+		m_x = x;
 		return *this;
 	}
-	inline const LibVector<T>& SetY(T y)
+	inline LibVector<T>& SetY(T y)
 	{
-		m_PtCoord.SetY(y);
+		m_y = y;
 		return *this;
 	}
-	inline const LibVector<T>& SetZ(T z)
+	inline LibVector<T>& SetZ(T z)
 	{
-		m_PtCoord.SetZ(z);
+		m_z = z;
 		return *this;
-	}
-	inline void SetCoordinates(const LibPoint<T>& coordinates)
-	{
-		m_PtCoord = coordinates;
 	}
 
 	bool IsParallel(const LibVector<T>& other, double eps = LibEps::eps) const
@@ -60,74 +50,83 @@ public:
 			LibEps::IsZero(crossVec.Y(), eps) &&
 			LibEps::IsZero(crossVec.Z(), eps);
 	};
-	
-	LibVector<T> operator*(T scalar)
+
+	LibVector<T> operator*(T scalar) const
 	{
-		return LibVector(LibPoint<T>(m_PtCoord.X() * scalar, m_PtCoord.Y() * scalar, m_PtCoord.Z() * scalar));
-	};
-	LibVector<T> operator/(T scalar)
+		return LibVector<T>(X() * scalar, Y() * scalar, Z() * scalar);
+	}
+
+	LibVector<T> operator/(T scalar) const
 	{
-		return LibVector(LibPoint<T>(m_PtCoord.X() / scalar, m_PtCoord.Y() / scalar, m_PtCoord.Z() / scalar));
+		return LibVector(X() / scalar, Y() / scalar, Z() / scalar);
 	};
-	LibVector<T> operator+(const LibVector<T>& other)
+
+	LibVector<T> operator+(const LibVector<T>& other) const
 	{
-		return m_PtCoord + other;
+		return LibVector<T>(m_x + other.X(), m_y + other.Y(), m_z + other.Z());
 	};
-	
-	LibVector<T> operator-(const LibVector<T>& other)
+
+	LibVector<T> operator-(const LibVector<T>& other) const
 	{
-		return m_PtCoord - other.Coordinates();
+		return LibVector<T>(m_x - other.X(), m_y - other.Y(), m_z - other.Z());
 	};
+
 	bool operator==(const LibVector<T>& other)
 	{
 		return IsEqual(other, LibEps::eps);
 	};
+
 	bool operator!=(const LibVector<T>& other)
 	{
-		return !(m_PtCoord == other.m_PtCoord);
-	};
-	bool IsEqual(const LibVector<T>& other, double eps = LibEps::eps) const
-	{
-		return IsParallel(other) && LibEps::IsZero(std::fabs(LengthVector() - other.LengthVector()), eps);
+		return !(*this == other);
 	};
 
-	bool IsZero() const
+	bool IsEqual(const LibVector<T>& other, double eps = LibEps::eps) const
 	{
-		return LibEps::IsZero(X) && LibEps::IsZero(Y) && LibEps::IsZero(Z);
+		return IsParallel(other, eps) && LibEps::IsZero(std::fabs(LengthVector() - other.LengthVector()), eps);
+	};
+
+	bool IsZero(double eps = LibEps::eps) const
+	{
+		return LibEps::IsZero(X(), eps) && LibEps::IsZero(Y(), eps) && LibEps::IsZero(Z(), eps);
 	};
 
 	double LengthVector() const
 	{
-		return std::sqrt(m_PtCoord.m_x * m_PtCoord.m_x +
-						 m_PtCoord.m_y * m_PtCoord.m_y +
-						 m_PtCoord.m_z * m_PtCoord.m_z);
+		return std::sqrt(X() * X() +
+			Y() * Y() +
+			Z() * Z());
 	};
+
 	LibVector<T>& NormalizeThis()
 	{
 		*this = GetNormalize();
 		return *this;
 	};
+
 	LibVector<T> GetNormalize() const
 	{
 		double length = LengthVector();
 		if (!IsZero())
 		{
-			return LibVector<T>(LibPoint<T>(m_PtCoord.X() / length, m_PtCoord.Y() / length, m_PtCoord.Z() / length));
+			return LibVector<T>(LibPoint<T>(X() / length, Y() / length, Z() / length));
 		}
 		return *this;
 	};
 
 	double DotProduct(const LibVector<T>& other) const
 	{
-		return m_PtCoord.X() * other.X() + m_PtCoord.Y() * other.Y() + m_PtCoord.Z() * other.Z();
+		return X() * other.X() + Y() * other.Y() + Z() * other.Z();
 	};
+
 	LibVector<T> CrossProduct(const LibVector<T>& other) const
 	{
-		return LibVector(LibPoint<T>(
-			m_PtCoord.Y() * other.Z() - m_PtCoord.Z() * other.Y(),
-			-m_PtCoord.X() * other.Z() + m_PtCoord.Z() * other.X(),
-			m_PtCoord.X() * other.Y() - m_PtCoord.Y() * other.X()));
+		return LibVector(
+			Y() * other.Z() - Z() * other.Y(),
+			-X() * other.Z() + Z() * other.X(),
+			X() * other.Y() - Y() * other.X());
 	};
+
 	double TripleProduct(const LibVector<T>& first, const LibVector<T>& second) const
 	{
 		auto crossVec = CrossProduct(first);
@@ -139,10 +138,11 @@ public:
 		T dotProduct = DotProduct(other);
 		return std::acos(dotProduct / (LengthVector() * other.LengthVector()));
 	};
-	T AngleTo(const LibVector<T>& vec2, const LibVector<T>& vecDir) const
+
+	T AngleTo(const LibVector<T>& vec2, const LibVector<T>& vecDir, double eps = LibEps::eps) const
 	{
 		auto val = AngleBetweenVec(vec2);
-		if (!vecDir.IsOpposite(CrossProduct(vec2)))
+		if (!vecDir.IsOpposite(CrossProduct(vec2)), eps)
 		{
 			return val;
 		}
@@ -154,9 +154,10 @@ public:
 	{
 		return LibEps::IsZero(std::fabs(DotProduct(other)), eps);
 	};
-	bool IsOpposite(const LibVector<T>& other) const
+
+	bool IsOpposite(const LibVector<T>& other, double eps = LibEps::eps) const
 	{
-		return DotProduct(other) < 0 && IsParallel(other);
+		return DotProduct(other) < 0 && IsParallel(other, eps);
 	};
 
 	LibVector<T> Rotate2D(double angle) const
@@ -168,23 +169,13 @@ public:
 	};
 
 private:
-	LibPoint<T> m_PtCoord;
+	T m_x;
+	T m_y;
+	T m_z;
 };
 
-template<typename T>
-LibVector<T> operator*(double scalar, const LibVector<T>& vec)
+template<typename T, typename S>
+LibVector<T> operator*(S scalar, const LibVector<T>& vec)
 {
 	return vec * scalar;
 };
-
-template<typename T>
-LibPoint<T> operator+(const LibPoint<T>& point, const LibVector<T>& vec)
-{
-	return LibPoint<T>(point.m_x + vec.X(), point.m_y + vec.Y(), point.m_z + vec.Z());
-}
-
-template<typename T>
-LibVector<T> operator-(const LibPoint<T>& first, const LibPoint<T>& second)
-{
-	return LibVector<T>(first.m_x - second.X, first.m_y - second.Y, first.m_z - second.Z);
-}

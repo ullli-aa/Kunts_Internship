@@ -1,6 +1,8 @@
 #pragma once
 
 #include "LibUtility.h"
+#include "LibVector.h"
+#include "LibEps.h"
 #include <cmath>
 
 template<typename T>
@@ -14,20 +16,21 @@ public:
 
 	T SquareDistanceTo(const LibPoint<T>& other) const
 	{
-		return LibUtility::Square(m_x - other.m_x) +
-			LibUtility::Square(m_y - other.m_y) +
-			LibUtility::Square(m_z - other.m_z);
+		return LibUtility<T>::Square(m_x - other.m_x) +
+			LibUtility<T>::Square(m_y - other.m_y) +
+			LibUtility<T>::Square(m_z - other.m_z);
 	};
+
 	T DistanceTo(const LibPoint<T>& other) const
 	{
 		return std::sqrt(SquareDistanceTo(other));
 	};
 
-	bool operator==(const LibPoint<T>& other) const 
+	bool operator==(const LibPoint<T>& other) const
 	{
 		return LibEps::IsZero(SquareDistanceTo(other));
 	};
-	
+
 	bool operator!=(const LibPoint<T>& other) const
 	{
 		return !(*this == other);
@@ -35,17 +38,19 @@ public:
 
 	bool IsEqual(const LibPoint<T>& other, double eps = 1e-9) const
 	{
-		return SquareDistanceTo(other) <= LibUtility::Square(eps);
+		return SquareDistanceTo(other) <= LibUtility<double>::Square(eps);
 	};
 
 	inline T X() const
 	{
 		return m_x;
 	};
+
 	inline T Y() const
 	{
 		return m_y;
 	};
+
 	inline T Z() const
 	{
 		return m_z;
@@ -56,16 +61,19 @@ public:
 		m_x = x;
 		return *this;
 	};
+
 	inline LibPoint<T>& SetY(T y)
 	{
 		m_y = y;
 		return *this;
 	};
+
 	inline LibPoint<T>& SetZ(T z)
 	{
 		m_z = z;
 		return *this;
 	};
+
 	inline void SetXYZ(T x = 0.0, T y = 0.0, T z = 0.0)
 	{
 		m_x = x;
@@ -73,9 +81,23 @@ public:
 		m_z = z;
 	};
 
-
 private:
 	T m_x;
 	T m_y;
 	T m_z;
+};
+
+template<typename T>
+LibPoint<T> operator+(const LibPoint<T>& point, const LibVector<T>& vec)
+{
+	return LibPoint<T>(point.X() + vec.X(), point.Y() + vec.Y(), point.Z() + vec.Z());
+};
+
+template<typename T>
+LibVector<T> operator-(const LibPoint<T>& first, const LibPoint<T>& second)
+{
+	return LibVector<T>(
+		first.X() - second.X(),
+		first.Y() - second.Y(),
+		first.Z() - second.Z());
 };

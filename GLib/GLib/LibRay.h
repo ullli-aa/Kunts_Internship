@@ -20,6 +20,7 @@ public:
 		}
 		return false;
 	};
+
 	bool IsIntersectionRay(const LibRay<T>& lnOther, LibPoint<T>& intersPoint) const
 	{
 		T coef1, coef2;
@@ -31,25 +32,21 @@ public:
 			}
 		}
 		return false;
-	}
-	;
+	};
+
 	LibPoint<T> ClosestPointOnLine(const LibPoint<T>& point) const override
 	{
-		LibVector<T> vec = LibVector<T>(point - this->m_ptOrigin);
-		this->m_ptDirection.Normalize();
-
-		double projectionLength = vec.DotProduct(this->m_ptDirection);
+		double projectionLength = GetCoefClosestPoint(point);
 		if (projectionLength < 0)
 		{
-			return this->m_ptOrigin;
+			return this->Origin();
 		}
-		LibVector<T> scalDir = projectionLength * this->m_ptDirection;
-		return this->m_ptOrigin + scalDir.Coordinates();
-	}
-	;
+		return GetClosestPoint(coef);
+	};
+
 	bool IsPointOnLine(const LibPoint<T>& point) const override
 	{
-		LibVector<T> vec = LibVector<T>(point - this->m_ptOrigin);
-		return !vec.IsOpposite(this->Direction) && vec.LengthVector >= 0;
+		LibVector<T> vec = LibVector<T>(point - this->Origin());
+		return !vec.IsOpposite(this->Direction()) && vec.LengthVector() >= 0;
 	};
 };

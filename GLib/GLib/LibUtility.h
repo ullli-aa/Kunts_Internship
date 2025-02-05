@@ -1,7 +1,9 @@
 #pragma once
 
+template<typename T>
 class LibUtility {
 public:
-	static double Square(double numb);
+	static T Square(T numb) {
+		return numb * numb;
+	};
 };
-

@@ -9,7 +9,7 @@ class LibSegment : public LibLine<T>
 public:
 	inline const LibPoint<T> EndPoint() const
 	{
-		return this->Origin() + this->Direction().Coordinates();
+		return this->Origin() + this->Direction();
 	}
 
 	bool IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& intersPoint) const override
@@ -24,7 +24,7 @@ public:
 			return GetIntersection(coefS);
 		}
 		return false
-		
+
 	}
 
 	bool IsIntersectionRay(const LibRay<T>& rayOther, LibPoint<T>& intersPoint) const
@@ -41,10 +41,10 @@ public:
 		return false;
 	}
 
-	bool IsIntersectionSegment(const LibRay<T>& sgmntOther, LibPoint<T>& intersPoint) const
+	bool IsIntersectionSegment(const LibSegment<T>& sgmntOther, LibPoint<T>& intersPoint) const
 	{
 		T coef1, coef2;
-		if (GetIntersParam(rayOther, coef1, coef2))
+		if (GetIntersParam(sgmntOther, coef1, coef2))
 		{
 			if (coef2 < 0 || coef2 > 1 || coef1 < 0 || coef1 > 1)
 			{
@@ -57,7 +57,7 @@ public:
 
 	LibPoint<T> ClosestPointOnLine(const LibPoint<T>& point) const override
 	{
-		LibPoint<T> end = EndPoint();
+		LibPoint<T> ptEnd = EndPoint();
 
 		LibVector<T> BegPoint = point - this->Origin();
 		LibVector<T> BegEnd = this->Direction();
@@ -68,11 +68,11 @@ public:
 			return this->Origin();
 		}
 		else if (projection > 1) {
-			return end;
+			return ptEnd;
 		}
 		else
 		{
-			return this->Origin() + projection * end;
+			return this->Origin() + projection * this->Direction();
 		}
 	}
 
@@ -81,7 +81,7 @@ public:
 		LibPoint<T> end = EndPoint();
 
 		LibVector<T> BegPoint = point - this->Origin();
-		LibVector<T> BegEnd = this->Direction() - end;
+		LibVector<T> BegEnd = this->Direction();
 
 		if (BegPoint.IsParallel(BegEnd))
 		{
