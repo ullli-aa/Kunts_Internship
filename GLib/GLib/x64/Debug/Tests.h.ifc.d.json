@@ -1,0 +1,10 @@
+{
+    "Version": "1.1",
+    "Data": {
+        "Source": "d:\\kunts_internship\\glib\\glib\\tests.h",
+        "ProvidedModule": "",
+        "Includes": [],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

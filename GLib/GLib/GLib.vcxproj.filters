@@ -59,5 +59,8 @@
     <ClInclude Include="LibSegment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MyTestMacros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

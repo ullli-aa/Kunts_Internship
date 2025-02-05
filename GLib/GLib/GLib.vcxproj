@@ -156,6 +156,7 @@
     <ClInclude Include="LibRay.h" />
     <ClInclude Include="LibUtility.h" />
     <ClInclude Include="LibVector.h" />
+    <ClInclude Include="MyTestMacros.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
