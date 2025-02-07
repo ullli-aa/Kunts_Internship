@@ -93,10 +93,21 @@ public:
 
 	double LengthVector() const
 	{
-		return std::sqrt(X() * X() +
-			Y() * Y() +
-			Z() * Z());
+		return std::sqrt(LengthVectorPow2());
 	};
+
+	double LengthVectorPow2() const
+	{
+		return X() * X() +
+			Y() * Y() +
+			Z() * Z();
+	};
+
+	LibVector<T> ProjectionOnto(const LibVector<T>& other) const {
+		T dotProduct = DotProduct(other);
+		T otherLengthSquared = other.LengthVectorPow2();
+		return (dotProduct / otherLengthSquared) * other;
+	}
 
 	LibVector<T>& NormalizeThis()
 	{
@@ -154,6 +165,13 @@ public:
 	{
 		return LibEps::IsZero(std::fabs(DotProduct(other)), eps);
 	};
+
+	LibVector<T> GetOrtogonalVec(const double eps = LibEps::eps) const {
+		if (LibEps::IsZero(X())) {
+			return LibVector<T>(0, Z(), -Y());
+		}
+		return LibVector<T>(Y(), -X(), 0);
+	}
 
 	bool IsOpposite(const LibVector<T>& other, double eps = LibEps::eps) const
 	{
