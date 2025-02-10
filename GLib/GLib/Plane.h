@@ -33,15 +33,15 @@ public:
 		return *this;
 	}
 
-	bool IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& intersPoint) const {
-		if (Normal().IsOrtogonal(lnOther.Direction())) {
+	bool IsIntersectionLine(const LibLine<T>& line, LibPoint<T>& intersPoint) const {
+		if (Normal().IsOrtogonal(line.Direction())) {
 			return false;
 		}
 
-		LibVector<T> ptPlaneToPtLine = StartPoint() - lnOther.Origin();
+		LibVector<T> vecPlaneToPtLine = StartPoint() - line.Origin();
 
-		T param = Normal().DotProduct(ptPlaneToPtLine) / Normal().DotProduct(lnOther.Direction());
-		intersPoint = lnOther.Origin() + param * lnOther.Direction();
+		T param = Normal().DotProduct(vecPlaneToPtLine) / Normal().DotProduct(line.Direction());
+		intersPoint = line.Origin() + param * line.Direction();
 		return true;
 	}
 
@@ -90,6 +90,11 @@ public:
 
 	LibVector<T> VecProjection(const LibVector<T>& vec) const {
 		return vec - vec.ProjectionOnto(Normal());
+	}
+
+	LibLine<T> LineProjection(const LibLine<T>& line) const {
+		return LibLine<T>(PointProjection(line.Origin()),
+			VecProjection(line.Direction()));
 	}
 
 private:
