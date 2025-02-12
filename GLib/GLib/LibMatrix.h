@@ -12,27 +12,25 @@ public:
 	};
 
 	LibMatrix(const T* data) {
-		memset(m_data, data, 16 * sizeof(T));
+		std::memspy(m_data, data, 16 * sizeof(T));
 	};
 
 	~LibMatrix() = default;
 
-	const T* Data() const {
+	inline const T* Data() const {
 		return m_data;
 	};
 
-	const T& GetNumb(int row, int col) const {
+	inline const T& GetNumb(uint32_t row, uint32_t col) const {
 		return m_data[row * 4 + col];
 	};
 
-	const LibMatrix<T>& SetData(const T* data) {
-		for (int i = 0; i < 16; ++i) {
-			m_data[i] = data[i];
-		}
+	inline const LibMatrix<T>& SetData(const T* data) {
+		std::memspy(m_data, data, 16 * sizeof(T));
 		return *this;
 	};
 
-	const LibMatrix<T>& SetNumb(T numb, int row, int col) {
+	inline const LibMatrix<T>& SetNumb(T numb, uint32_t row, uint32_t col) {
 		m_data[row * 4 + col] = numb;
 		return *this;
 	};
@@ -59,6 +57,11 @@ public:
 
 	bool operator==(const LibMatrix<T>& other) const {
 		return IsEqual(other);
+	}
+
+	const T* operator[](int row) const
+	{
+		return &m_data[row * 4];
 	}
 
 	const LibMatrix<T> operator*(const LibMatrix<T>& other) const {
@@ -119,7 +122,7 @@ public:
 		LibMatrix<T> result;
 		for (int i = 0; i < 4; ++i) {
 			for (int j = 0; j < 4; ++j) {
-				result.SetNumb(j, i) = this->GetNumb(i, j);
+				result.SetNumb(GetNumb(i, j), j, i);
 			}
 		}
 		return result;
@@ -161,6 +164,10 @@ public:
 		return result;
 	}
 
+	void InverseThis() {
+		memset(m_data, InverseCopy().Data(), 16 * sizeof(T));
+	}
+
 	static LibMatrix<T> TranslationInit(const LibVector<T>& move) const {
 		LibMatrix<T> mtrx = IdentityMatrix();
 		mtrx.SetNumb(move.X(), 3, 0);
@@ -182,8 +189,8 @@ public:
 		T cosTheta = std::cos(theta);
 		T sinTheta = std::sin(theta);
 		mtrx.SetNumb(cosTheta, 1, 1);
-		mtrx.SetNumb(-sinTheta, 1, 2);
-		mtrx.SetNumb(sinTheta, 2, 1);
+		mtrx.SetNumb(sinTheta, 1, 2);
+		mtrx.SetNumb(-sinTheta, 2, 1);
 		mtrx.SetNumb(cosTheta, 2, 2);
 		return mtrx;
 	}
@@ -193,8 +200,8 @@ public:
 		T cosTheta = std::cos(theta);
 		T sinTheta = std::sin(theta);
 		mtrx.SetNumb(cosTheta, 0, 0);
-		mtrx.SetNumb(sinTheta, 0, 2);
-		mtrx.SetNumb(-sinTheta, 2, 0);
+		mtrx.SetNumb(-sinTheta, 0, 2);
+		mtrx.SetNumb(sinTheta, 2, 0);
 		mtrx.SetNumb(cosTheta, 2, 2);
 		return mtrx;
 	}
@@ -204,17 +211,38 @@ public:
 		T cosTheta = std::cos(theta);
 		T sinTheta = std::sin(theta);
 		mtrx.SetNumb(cosTheta, 0, 0);
-		mtrx.SetNumb(-sinTheta, 0, 1);
-		mtrx.SetNumb(sinTheta, 1, 0);
+		mtrx.SetNumb(sinTheta, 0, 1);
+		mtrx.SetNumb(-sinTheta, 1, 0);
 		mtrx.SetNumb(cosTheta, 1, 1);
 		return mtrx;
+	}
+
+	static LibMatrix<T> Rotation(const LibVector<T> axis, T theta) {
+		LibVector<T> normAxis = axis.GetNormalize();
+		LibMatrix<T> res;
+
+		T cos = std::cos(theta);
+		T mCos = 1 - cos;
+		T sin = std::sin(theta);
+		T x = normAxis.X();
+		T y = normAxis.Y();
+		T z = normAxis.Z();
+		res.SetNumb(cos + x * x * mCos, 0, 0);
+		res.SetNumb(cos + y * y * mCos, 1, 1);
+		res.SetNumb(cos + z * z * mCos, 2, 2);
+		res.SetNumb(x * y * mCos - z * sin, 1, 0);
+		res.SetNumb(x * y * mCos + z * sin, 0, 1);
+		res.SetNumb(x * z * mCos + y * sin, 2, 0);
+		res.SetNumb(x * z * mCos - y * sin, 0, 2);
+		res.SetNumb(y * z * mCos + x * sin, 1, 2);
+		res.SetNumb(y * z * mCos - x * sin, 2, 1);
 	}
 
 	static LibMatrix<T> ToCoordinatesInit(const LibVector<T>& a, const LibVector<T>& b, const LibVector<T>& c) {
 		T new_mtrx[16] = { a.X(), a.Y(), a.Z(), 0, b.X(), b.Y(), b.Z(), 0, c.X(), c.Y(), c.Z(), 0, 0, 0, 0, 1 };
 		LibMatrix<T> res(new_mtrx);
 
-		res.Inverse(res);
+		res = InverseCopy(res);
 		return res;
 	}
 protected:
