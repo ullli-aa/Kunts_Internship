@@ -3,7 +3,7 @@
 #include "MyTestMacros.h"
 #include "LibPoint.h"
 #include "LibVector.h"
-#include "LibPlane.h"
+#include "LibMatrix.h"
 
 class Tests {
 public:
@@ -141,6 +141,98 @@ public:
 		MY_ASSERT_TRUE(result.IsZero());
 	}
 
+	void MatrixTest_Equal()
+	{
+		LibMatrix<double> mtrx1 = LibMatrix<double>::IdentityMatrix();
+		LibMatrix<double> mtrx2 = LibMatrix<double>::IdentityMatrix();
+
+		MY_ASSERT_MTRX_EQ(mtrx1, mtrx2);
+
+		mtrx1.SetNumb(1 + 1e-10, 0, 0);
+		MY_ASSERT_FALSE(mtrx1.IsEqual(mtrx2, 1e-12));
+		MY_ASSERT_TRUE(mtrx1.IsEqual(mtrx2));
+
+		mtrx1.SetNumb(1 + 5e-9, 0, 0);
+		MY_ASSERT_FALSE(mtrx1 == mtrx2);
+
+		MY_ASSERT_TRUE(!(mtrx1 == LibMatrix<double>::ZeroMatrix()));
+	}
+
+	void MatrixTest_Translation()
+	{
+		LibMatrix<double> tr = LibMatrix<double>::TranslationInit(LibVector<double>(1, 2, 3));
+		LibPoint<double> pt(2, 1, 3);
+
+		MY_ASSERT_VEC_EQ(LibPoint<double>(3, 3, 6), LibMatrix<double>::MultPt(pt, tr));
+
+		tr = LibMatrix<double>::TranslationInit(LibVector<double>(0, 0, 0));
+		MY_ASSERT_VEC_EQ(pt, LibMatrix<double>::MultPt(pt, tr));
+
+		tr = LibMatrix<double>::TranslationInit(LibVector<double>(-1, -1, -2));
+		MY_ASSERT_VEC_EQ(LibPoint<double>(1, 0, 1), LibMatrix<double>::MultPt(pt, tr));
+	}
+
+	void MatrixTest_Scaling()
+	{
+		LibMatrix<double> sc = LibMatrix<double>::ScalingInit(LibVector<double>(1, 2, 3));
+		LibPoint<double> pt(2, 1, 3);
+
+		MY_ASSERT_VEC_EQ(LibPoint<double>(2, 2, 9), LibMatrix<double>::MultPt(pt, sc));
+
+		sc = LibMatrix<double>::ScalingInit(LibVector<double>(1, 1, 1));
+		MY_ASSERT_VEC_EQ(pt, LibMatrix<double>::MultPt(pt, sc));
+
+		sc = LibMatrix<double>::ScalingInit(LibVector<double>(-1, -1, -1));
+		MY_ASSERT_VEC_EQ(LibPoint<double>(-2, -1, -3), LibMatrix<double>::MultPt(pt, sc));
+
+		sc = LibMatrix<double>::ScalingInit(LibVector<double>(-1, 2, 0));
+		MY_ASSERT_VEC_EQ(LibPoint<double>(-2, 2, 0), LibMatrix<double>::MultPt(pt, sc));
+
+		sc = LibMatrix<double>::ScalingInit(LibVector<double>(0, 0, 0));
+		MY_ASSERT_VEC_EQ(LibPoint<double>(0, 0, 0), LibMatrix<double>::MultPt(pt, sc));
+	}
+
+	void MatrixTest_Rotation()
+	{
+		LibMatrix<double> mtrx = LibMatrix<double>::IdentityMatrix();
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationX(0));
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationX(2 * M_PI));
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationY(0));
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationY(2 * M_PI));
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationZ(0));
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationZ(2 * M_PI));
+
+		mtrx.SetNumb(0, 1, 1); mtrx.SetNumb(1, 1, 2); mtrx.SetNumb(-1, 2, 1); mtrx.SetNumb(0, 2, 2);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationX(M_PI / 2));
+
+		mtrx.SetNumb(-1, 1, 2); mtrx.SetNumb(1, 2, 1);;
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationX(3 * M_PI / 2));
+
+		mtrx = LibMatrix<double>::IdentityMatrix();
+		mtrx.SetNumb(-1, 1, 1); mtrx.SetNumb(-1, 2, 2);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationX(M_PI));
+
+		mtrx = LibMatrix<double>::ZeroMatrix();
+		mtrx.SetNumb(-1, 0, 2); mtrx.SetNumb(1, 1, 1); mtrx.SetNumb(1, 2, 0); mtrx.SetNumb(1, 3, 3);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationY(M_PI / 2));
+		mtrx.SetNumb(1, 0, 2); mtrx.SetNumb(-1, 2, 0);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationY(3 * M_PI / 2));
+
+		mtrx = LibMatrix<double>::IdentityMatrix();
+		mtrx.SetNumb(-1, 0, 0); mtrx.SetNumb(-1, 2, 2);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationY(M_PI));
+
+		mtrx = LibMatrix<double>::ZeroMatrix();
+		mtrx.SetNumb(1, 0, 1); mtrx.SetNumb(1, 3, 3);  mtrx.SetNumb(1, 2, 2); mtrx.SetNumb(-1, 1, 0);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationZ(M_PI / 2));
+		mtrx.SetNumb(-1, 0, 1); mtrx.SetNumb(1, 1, 0);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationZ(3 * M_PI / 2));
+
+		mtrx = LibMatrix<double>::IdentityMatrix();
+		mtrx.SetNumb(-1, 0, 0); mtrx.SetNumb(-1, 1, 1);
+		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationZ(M_PI));
+	}
+
 	void RunAllTests() {
 		RUN_TEST(PointTest_DistanceTo);
 		RUN_TEST(PointTest_Operators);
@@ -149,6 +241,10 @@ public:
 		RUN_TEST(VecTest_EqOperators);
 		RUN_TEST(VecTest_ScalarMultOperator);
 		RUN_TEST(VecTest_ScalarDivOperator);
+		RUN_TEST(MatrixTest_Equal);
+		RUN_TEST(MatrixTest_Translation);
+		RUN_TEST(MatrixTest_Scaling);
+		RUN_TEST(MatrixTest_Rotation);
 	}
 };
 

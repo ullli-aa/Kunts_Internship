@@ -12,7 +12,7 @@ public:
 	};
 
 	LibMatrix(const T* data) {
-		std::memspy(m_data, data, 16 * sizeof(T));
+		std::memcpy(m_data, data, 16 * sizeof(T));
 	};
 
 	~LibMatrix() = default;
@@ -21,16 +21,16 @@ public:
 		return m_data;
 	};
 
-	inline const T& GetNumb(uint32_t row, uint32_t col) const {
+	inline const T& GetNumb(size_t row, size_t col) const {
 		return m_data[row * 4 + col];
 	};
 
 	inline const LibMatrix<T>& SetData(const T* data) {
-		std::memspy(m_data, data, 16 * sizeof(T));
+		std::memcpy(m_data, data, 16 * sizeof(T));
 		return *this;
 	};
 
-	inline const LibMatrix<T>& SetNumb(T numb, uint32_t row, uint32_t col) {
+	inline const LibMatrix<T>& SetNumb(T numb, size_t row, size_t col) {
 		m_data[row * 4 + col] = numb;
 		return *this;
 	};
@@ -41,7 +41,8 @@ public:
 	}
 
 	static LibMatrix<T> IdentityMatrix() {
-		static LibMatrix<T> matrix{ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+		T data[16] = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+		static LibMatrix<T> matrix(data);
 		return matrix;
 	}
 
@@ -55,11 +56,11 @@ public:
 		return true;
 	}
 
-	bool operator==(const LibMatrix<T>& other) const {
-		return IsEqual(other);
+	bool operator==(const LibMatrix<T>& other) {
+		return this->IsEqual(other);
 	}
 
-	const T* operator[](int row) const
+	const T* operator[](size_t row) const
 	{
 		return &m_data[row * 4];
 	}
@@ -78,20 +79,17 @@ public:
 		return result;
 	}
 
-	const LibVector<T> operator*(const LibVector<T>& vec) const {
+	static LibVector<T> MultVec(const LibVector<T>& vec, const LibMatrix<T>& mtrx) {
 		LibVector<T> result;
-		result.SetX(GetNumb(0, 0) * vec.X() + GetNumb(1, 0) * vec.Y() + GetNumb(2, 0) * vec.Z());
-		result.SetY(GetNumb(0, 1) * vec.X() + GetNumb(1, 1) * vec.Y() + GetNumb(2, 1) * vec.Z());
-		result.SetZ(GetNumb(0, 2) * vec.X() + GetNumb(1, 2) * vec.Y() + GetNumb(2, 2) * vec.Z());
+		result.SetX(mtrx[0][0] * vec.X() + mtrx[1][0] * vec.Y() + mtrx[2][0] * vec.Z());
+		result.SetY(mtrx[0][1] * vec.X() + mtrx[1][1] * vec.Y() + mtrx[2][1] * vec.Z());
+		result.SetZ(mtrx[0][2] * vec.X() + mtrx[1][2] * vec.Y() + mtrx[2][2] * vec.Z());
 		return result;
 	}
 
-	const LibPoint<T> operator*(const LibPoint<T>& pt) const {
-		LibPoint<T> result;
-		result.SetX(GetNumb(0, 0) * pt.X() + GetNumb(1, 0) * pt.Y() + GetNumb(2, 0) * pt.Z() + GetNumb(3, 0));
-		result.SetY(GetNumb(0, 1) * pt.X() + GetNumb(1, 1) * pt.Y() + GetNumb(2, 1) * pt.Z() + GetNumb(3, 1));
-		result.SetZ(GetNumb(0, 2) * pt.X() + GetNumb(1, 2) * pt.Y() + GetNumb(2, 2) * pt.Z() + GetNumb(3, 2));
-		return result;
+	static LibPoint<T> MultPt(const LibPoint<T>& pt, const LibMatrix<T>& mtrx) {
+		LibVector<T> res = MultVec(LibVector<T>(pt.X(), pt.Y(), pt.Z()), mtrx);
+		return LibPoint<T>(res.X() + mtrx[3][0], res.Y() + mtrx[3][1], res.Z() + mtrx[3][2]);
 	}
 
 	T Determinant() const {
@@ -128,7 +126,7 @@ public:
 		return result;
 	}
 
-	const LibMatrix<T> InverseCopy() const {
+	LibMatrix<T> InverseCopy() const {
 		LibMatrix<T> result;
 		T det = Determinant();
 
@@ -165,10 +163,10 @@ public:
 	}
 
 	void InverseThis() {
-		memset(m_data, InverseCopy().Data(), 16 * sizeof(T));
+		*this = InverseCopy();
 	}
 
-	static LibMatrix<T> TranslationInit(const LibVector<T>& move) const {
+	static LibMatrix<T> TranslationInit(const LibVector<T>& move) {
 		LibMatrix<T> mtrx = IdentityMatrix();
 		mtrx.SetNumb(move.X(), 3, 0);
 		mtrx.SetNumb(move.Y(), 3, 1);
@@ -176,7 +174,7 @@ public:
 		return mtrx;
 	}
 
-	static LibMatrix<T> ScalingInit(const LibVector<T>& scale) const {
+	static LibMatrix<T> ScalingInit(const LibVector<T>& scale)  {
 		LibMatrix<T> mtrx = IdentityMatrix();
 		mtrx.SetNumb(scale.X(), 0, 0);
 		mtrx.SetNumb(scale.Y(), 1, 1);
@@ -238,12 +236,20 @@ public:
 		res.SetNumb(y * z * mCos - x * sin, 2, 1);
 	}
 
-	static LibMatrix<T> ToCoordinatesInit(const LibVector<T>& a, const LibVector<T>& b, const LibVector<T>& c) {
-		T new_mtrx[16] = { a.X(), a.Y(), a.Z(), 0, b.X(), b.Y(), b.Z(), 0, c.X(), c.Y(), c.Z(), 0, 0, 0, 0, 1 };
+	static LibMatrix<T> ToCoordinatesInit(const LibVector<T>& a, const LibVector<T>& b, const LibVector<T>& c, const LibPoint<T>& pt) {
+		T new_mtrx[16] = { a.X(), a.Y(), a.Z(), 0, b.X(), b.Y(), b.Z(), 0, c.X(), c.Y(), c.Z(), 0, pt.X(), pt.Y(), pt.Z(), 1 };
 		LibMatrix<T> res(new_mtrx);
 
 		res = InverseCopy(res);
 		return res;
+	}
+
+	void Print()
+	{
+		for (size_t i = 0; i < 16; i++)
+		{
+			std::cerr << m_data[i] << ' ';
+		}
 	}
 protected:
 	T Determinate33(const T* matrix) const {

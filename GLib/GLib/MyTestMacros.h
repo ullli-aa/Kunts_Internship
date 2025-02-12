@@ -10,14 +10,14 @@
 
 #define MY_ASSERT_DOUBLE_EQ(expected, actual) \
     if (std::fabs(expected - actual) > 1e-9) { \
-        std::cerr << RED << "Assertion failed: " << #expected << " == " << #actual \
+        std::cerr << RED << "Assertion failed: " << #expected << " != " << #actual \
                   << " at " << __FILE__ << ":" << __LINE__ << RESET << std::endl; \
         throw std::runtime_error("Test failed!"); \
     }
 
 #define MY_ASSERT_EQ(expected, actual) \
     if ((expected) != (actual)) { \
-        std::cerr << RED << "Assertion failed: " << #expected << " == " << #actual \
+        std::cerr << RED << "Assertion failed: " << #expected << " != " << #actual \
                   << " at " << __FILE__ << ":" << __LINE__ << RESET << std::endl; \
         throw std::runtime_error("Test failed!"); \
     }
@@ -26,6 +26,15 @@
     MY_ASSERT_DOUBLE_EQ(expected.X(), actual.X()); \
     MY_ASSERT_DOUBLE_EQ(expected.Y(), actual.Y()); \
     MY_ASSERT_DOUBLE_EQ(expected.Z(), actual.Z());
+
+#define MY_ASSERT_MTRX_EQ(expected, actual) \
+    for (int i = 0; i < 16; ++i) { \
+        if (std::fabs(expected.Data()[i] - actual.Data()[i]) > 1e-9) { \
+            std::cerr << RED << "Assertion failed: " << #expected << " != " << #actual \
+            << " at " << __FILE__ << ":" << __LINE__ << RESET << std::endl; \
+            throw std::runtime_error("Test failed!"); \
+        } \
+    };
 
 #define MY_ASSERT_TRUE(condition) \
     if (!(condition)) { \
