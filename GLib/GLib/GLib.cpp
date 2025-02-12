@@ -3,6 +3,7 @@
 #include "MyTestMacros.h"
 #include "LibPoint.h"
 #include "LibVector.h"
+#include "LibPlane.h"
 
 class Tests {
 public:

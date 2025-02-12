@@ -149,6 +149,7 @@
     <ClCompile Include="LibVector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LibCylinder.h" />
     <ClInclude Include="LibSegment.h" />
     <ClInclude Include="LibEps.h" />
     <ClInclude Include="LibLine.h" />
@@ -156,6 +157,7 @@
     <ClInclude Include="LibRay.h" />
     <ClInclude Include="LibUtility.h" />
     <ClInclude Include="LibVector.h" />
+    <ClInclude Include="LibMatrix.h" />
     <ClInclude Include="MyTestMacros.h" />
     <ClInclude Include="Plane.h" />
   </ItemGroup>
