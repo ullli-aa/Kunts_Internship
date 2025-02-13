@@ -5,6 +5,8 @@
 #include "LibLine.h"
 #include "LibEps.h"
 #include "LibUtility.h"
+#include "LibMatrix.h"
+#include <vector>
 
 template<typename T>
 class LibCylinder {
@@ -41,23 +43,76 @@ public:
 		return *this;
 	}
 
-	bool IsIntersectionLine(const LibLine<T>& line, LibPoint<T>& intersPoint) const {
-		//TODO
+	std::vector<LibPoint<T>> IsIntersectionLine(const LibLine<T>& line) const {
+		std::vector<LibPoint<T>> result;
+		LibVector<T> n1, n2;
+		GetCoordVec(n1, n2);
+
+		LibMatrix<T> locCoord = LibMatrix<T>::ToCoordinatesInit(n1, n2, Direction(), StartPoint());
+		// line to loc coord
+		LibLine<T> locLine = LibLine<T>(LibMatrix<T>::MultPt(line.Origin(), locCoord),
+			LibMatrix<T>::MultVec(line.Direction(), locCoord));
+
+		// look at OXY (x - x0)^2 + (y - y0)^2 = r^2
+		T dx = locLine.Direction().X();
+		T dy = locLine.Direction().Y();
+		T dz = locLine.Direction().Z();
+		T px = locLine.Origin().X();
+		T py = locLine.Origin().Y();
+		T pz = locLine.Origin().Z();
+
+		T a = dx * dx + dy * dy;
+		T b = 2 * (dx * px - dx * StartPoint().X() + dy * py - dy * StartPoint().Y());
+		T c = (px - StartPoint().X()) * (px - StartPoint().X()) +
+			(py - StartPoint().Y()) * (py - StartPoint().Y()) - Radius() * Radius();
+
+		//count discriminant 
+		T D = b * b - 4 * a * c;
+
+		if (D < 0) {
+			return result; // no inters
+		}
+
+		LibMatrix<T> globCoord = LibMatrix<T>::ToCoordinatesInit(
+			LibVector<T>(1, 0, 0), LibVector<T>(0, 1, 0), LibVector<T>(0, 0, 1), LibPoint<T>(0, 0, 0));
+
+		LibPoint<T> pt1, pt2;
+
+		T t1 = (-b + std::sqrt(D)) / (2 * a);
+		result.push_back(GetResForInters(t1, locLine, globCoord));
+
+		if (D > 0) {
+			T t2 = (-b - std::sqrt(D)) / (2 * a);
+			result.push_back(GetResForInters(t2, locLine, globCoord));
+		}
+
+		return result;
 	}
 
 	bool GetParamByPoint(const LibPoint<T>& pt, double& prmU, double& prmV) const {
-		//TODO
-	}
-
-	LibPoint<T> GetPointByParam(const double prmU, const double prmV) const {
-		//TODO
-	}
-
-	bool GetNormalInPt(const LibPoint<T>& pt, LibVector<T>& normal) const {
 		if (!IsPointOnCylinder(pt)) {
 			return false;
 		}
 
+		LibVector<T> n1, n2;
+		GetCoordVec(n1, n2);
+
+		LibMatrix<T> locCoord = LibMatrix<T>::ToCoordinatesInit(n1, n2, Direction(), StartPoint());
+		LibPoint<T> locPt = LibMatrix<T>::MultPt(pt, locCoord);
+		prmV = locPt.Z();
+		prmU = std::atan2(locPt.X(), locPt.Y());
+		return true;
+	}
+
+	LibPoint<T> GetPointByParam(const double prmU, const double prmV) const {
+		LibVector<T> n1, n2;
+		GetCoordVec(n1, n2);
+		
+		LibPoint<T> pt = StartPoint() + prmV * Direction() + Radius() * (std::cos(prmU) * n1 + std::sin(prmU) * n2);
+		return pt;
+	}
+
+	bool GetNormalInPt(const LibPoint<T>& pt, LibVector<T>& normal) const {
 		LibPoint<T> ptClosestToAxis = GetClosestAxisPoint(pt);
 		normal = pt - ptClosestToAxis;
 		normal.NormalizeThis();
@@ -84,6 +139,16 @@ private:
 	LibPoint<T> GetClosestAxisPoint(LibPoint<T> pt) {
 		LibLine<T> axis(StartPoint(), Direction());
 		return ptClosestToAxis = axis.ClosestPointOnLine(pt);
+	}
+
+	void GetCoordVec(LibVector<T>& n1, LibVector<T>& n2) {
+		n1 = Direction().GetOrtogonalVec();
+		n2 = Direction().CrossProduct(n1);
+	}
+
+	LibPoint<T> GetResForInters(const T prm, const LibLine<T>& locLine, const LibMatrix<T>& globCoord) {
+		LibPoint<T> pt = locLine.Origin() + prm * locLine.Direction();
+		return LibMatrix<T>::MultPt(pt, globCoord);
 	}
 
 	LibPoint<T> m_ptStartPt;

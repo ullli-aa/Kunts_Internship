@@ -247,23 +247,21 @@ public:
 		LibMatrix<double> sc = LibMatrix<double>::ScalingInit(LibVector<double>(2, -1, 0));
 
 		LibPoint<double> pt(1, 2, 1);
-		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc), LibPoint<double>(4, -4, 0));
-		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, sc), tr), LibPoint<double>(3, 0, 3));
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc), LibMatrix<double>::MultPt(pt, tr * sc));
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, sc), tr), LibMatrix<double>::MultPt(pt, sc * tr));
 
 		sc = LibMatrix<double>::ScalingInit(LibVector<double>(0, 0, 0));
-		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, sc), tr) == LibPoint<double>(1, 2, 3));
-		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc) == LibPoint<double>(0, 0, 0));
+		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, sc), tr) == LibMatrix<double>::MultPt(pt, sc * tr));
+		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc) == LibMatrix<double>::MultPt(pt, tr * sc));
 
 		LibMatrix<double> rotX = LibMatrix<double>::RotationX(M_PI / 2);
-		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), rotX), LibPoint<double>(2, -4, 4));
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), rotX), LibMatrix<double>::MultPt(pt, tr * rotX));
 		sc = LibMatrix<double>::ScalingInit(LibVector<double>(1, 0, 2));
 		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(
-			LibMatrix<double>::MultPt(pt, tr), rotX), sc), LibPoint<double>(2, 0, 8));
+			LibMatrix<double>::MultPt(pt, tr), rotX), sc), LibMatrix<double>::MultPt(pt, tr * rotX * sc));
 
 		rotX = LibMatrix<double>::RotationX(2 * M_PI);
-		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(
-			LibMatrix<double>::MultPt(pt, tr), rotX), sc) == 
-			LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc));
+		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(pt, tr * rotX * sc) == LibMatrix<double>::MultPt(pt, tr * sc));
 	}
 
 	void RunAllTests() {
