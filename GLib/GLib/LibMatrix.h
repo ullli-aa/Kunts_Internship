@@ -215,7 +215,7 @@ public:
 		return mtrx;
 	}
 
-	static LibMatrix<T> Rotation(const LibVector<T> axis, T theta) {
+	static LibMatrix<T> Rotation(const LibVector<T>& axis, T theta) {
 		LibVector<T> normAxis = axis.GetNormalize();
 		LibMatrix<T> res;
 
@@ -234,10 +234,15 @@ public:
 		res.SetNumb(x * z * mCos - y * sin, 0, 2);
 		res.SetNumb(y * z * mCos + x * sin, 1, 2);
 		res.SetNumb(y * z * mCos - x * sin, 2, 1);
+		res.SetNumb(1, 3, 3);
+		return res;
 	}
 
 	static LibMatrix<T> ToCoordinatesInit(const LibVector<T>& a, const LibVector<T>& b, const LibVector<T>& c, const LibPoint<T>& pt) {
-		T new_mtrx[16] = { a.X(), a.Y(), a.Z(), 0, b.X(), b.Y(), b.Z(), 0, c.X(), c.Y(), c.Z(), 0, pt.X(), pt.Y(), pt.Z(), 1 };
+		T new_mtrx[16] = { a.X(), a.Y(), a.Z(), 0,
+						b.X(), b.Y(), b.Z(), 0,
+						c.X(), c.Y(), c.Z(), 0,
+						pt.X(), pt.Y(), pt.Z(), 1 };
 		LibMatrix<T> res(new_mtrx);
 
 		res = InverseCopy(res);

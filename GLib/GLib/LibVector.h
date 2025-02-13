@@ -120,7 +120,7 @@ public:
 		double length = LengthVector();
 		if (!IsZero())
 		{
-			return LibVector<T>(LibPoint<T>(X() / length, Y() / length, Z() / length));
+			return LibVector<T>(X() / length, Y() / length, Z() / length);
 		}
 		return *this;
 	};

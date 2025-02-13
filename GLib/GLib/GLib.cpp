@@ -231,6 +231,39 @@ public:
 		mtrx = LibMatrix<double>::IdentityMatrix();
 		mtrx.SetNumb(-1, 0, 0); mtrx.SetNumb(-1, 1, 1);
 		MY_ASSERT_MTRX_EQ(mtrx, LibMatrix<double>::RotationZ(M_PI));
+
+		MY_ASSERT_TRUE(LibMatrix<double>::Rotation(LibVector<double>(1, 0, 0), M_PI / 34) == 
+			LibMatrix<double>::RotationX(M_PI / 34));
+
+		mtrx = LibMatrix<double>::IdentityMatrix();
+		mtrx.SetNumb(0.5, 0, 0); mtrx.SetNumb(0.5, 0, 1); mtrx.SetNumb(- 1 / std::sqrt(2), 0, 2);
+		mtrx.SetNumb(0.5, 1, 0); mtrx.SetNumb(0.5, 1, 1); mtrx.SetNumb(1 / std::sqrt(2), 1, 2);
+		mtrx.SetNumb(1 / std::sqrt(2), 2, 0); mtrx.SetNumb(-1 / std::sqrt(2), 2, 1); mtrx.SetNumb(0, 2, 2);
+		MY_ASSERT_TRUE(LibMatrix<double>::Rotation(LibVector<double>(1, 1, 0), M_PI / 2) == mtrx)
+	}
+
+	void MatrixTest_OpCombination() {
+		LibMatrix<double> tr = LibMatrix<double>::TranslationInit(LibVector<double>(1, 2, 3));
+		LibMatrix<double> sc = LibMatrix<double>::ScalingInit(LibVector<double>(2, -1, 0));
+
+		LibPoint<double> pt(1, 2, 1);
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc), LibPoint<double>(4, -4, 0));
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, sc), tr), LibPoint<double>(3, 0, 3));
+
+		sc = LibMatrix<double>::ScalingInit(LibVector<double>(0, 0, 0));
+		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, sc), tr) == LibPoint<double>(1, 2, 3));
+		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc) == LibPoint<double>(0, 0, 0));
+
+		LibMatrix<double> rotX = LibMatrix<double>::RotationX(M_PI / 2);
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), rotX), LibPoint<double>(2, -4, 4));
+		sc = LibMatrix<double>::ScalingInit(LibVector<double>(1, 0, 2));
+		MY_ASSERT_VEC_EQ(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(
+			LibMatrix<double>::MultPt(pt, tr), rotX), sc), LibPoint<double>(2, 0, 8));
+
+		rotX = LibMatrix<double>::RotationX(2 * M_PI);
+		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(
+			LibMatrix<double>::MultPt(pt, tr), rotX), sc) == 
+			LibMatrix<double>::MultPt(LibMatrix<double>::MultPt(pt, tr), sc));
 	}
 
 	void RunAllTests() {
@@ -245,6 +278,7 @@ public:
 		RUN_TEST(MatrixTest_Translation);
 		RUN_TEST(MatrixTest_Scaling);
 		RUN_TEST(MatrixTest_Rotation);
+		RUN_TEST(MatrixTest_OpCombination);
 	}
 };
 
