@@ -245,7 +245,7 @@ public:
 						pt.X(), pt.Y(), pt.Z(), 1 };
 		LibMatrix<T> res(new_mtrx);
 
-		res = InverseCopy(res);
+		res = res.InverseCopy();
 		return res;
 	}
 

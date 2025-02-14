@@ -65,7 +65,7 @@ public:
 		T coef1, coef2;
 		if (GetIntersParam(lnOther, coef1, coef2))
 		{
-			return GetIntersection(coef2);
+			return GetIntersection(coef2, intersPoint);
 		}
 		return false;
 	};
@@ -102,7 +102,7 @@ public:
 		}
 
 		//ищем вектор перпендикулярный плоскости, которая проходит через lnOther и параллельно this
-		LibVector<T> vecCross = m_ptDirection.CrossProduct(lnOther.m_ptDirection);
+		LibVector<T> vecCross = m_vecDirection.CrossProduct(lnOther.m_ptDirection);
 		vecCross.NormalizeThis();
 
 		//свободный член уравнения плоскости
@@ -123,24 +123,24 @@ protected:
 
 		LibVector<T> vec = m_ptOrigin - lnOther.m_ptOrigin;
 
-		coef1 = vec.CrossProduct(m_vecDirection) / vecCross;
-		coef2 = vec.CrossProduct(lnOther.Direction()) / vecCross;
+		coef1 = vec.CrossProduct(Direction()).LengthVector() / vecCross.LengthVector();
+		coef2 = vec.CrossProduct(lnOther.Direction()).LengthVector() / vecCross.LengthVector();
 		return true;
 	};
 
-	bool GetIntersection(T coef, LibPoint<T>& intersPoint)
+	bool GetIntersection(T coef, LibPoint<T>& intersPoint) const
 	{
 		intersPoint = m_ptOrigin + coef * m_vecDirection;
 		return true;
 	};
 
-	double GetCoefClosestPoint(const LibPoint<T>& point)
+	double GetCoefClosestPoint(const LibPoint<T>& point) const
 	{
 		LibVector<T> vec = LibVector<T>(point - m_ptOrigin);
 		return vec.DotProduct(m_vecDirection.GetNormalize());
 	}
 
-	LibPoint<T> GetClosestPoint(double coef)
+	LibPoint<T> GetClosestPoint(double coef) const
 	{
 		return m_ptOrigin + coef * m_vecDirection;
 	}

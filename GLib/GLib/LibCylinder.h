@@ -25,7 +25,7 @@ public:
 	}
 
 	inline T Radius() const {
-		return radius;
+		return m_TRadius;
 	}
 
 	inline LibCylinder<T>& SetStart(const LibPoint<T>& pt) {
@@ -49,6 +49,7 @@ public:
 		GetCoordVec(n1, n2);
 
 		LibMatrix<T> locCoord = LibMatrix<T>::ToCoordinatesInit(n1, n2, Direction(), StartPoint());
+
 		// line to loc coord
 		LibLine<T> locLine = LibLine<T>(LibMatrix<T>::MultPt(line.Origin(), locCoord),
 			LibMatrix<T>::MultVec(line.Direction(), locCoord));
@@ -100,7 +101,7 @@ public:
 		LibMatrix<T> locCoord = LibMatrix<T>::ToCoordinatesInit(n1, n2, Direction(), StartPoint());
 		LibPoint<T> locPt = LibMatrix<T>::MultPt(pt, locCoord);
 		prmV = locPt.Z();
-		prmU = std::atan2(locPt.X(), locPt.Y());
+		prmU = std::atan2(locPt.Y(), locPt.X());
 		return true;
 	}
 
@@ -119,7 +120,7 @@ public:
 		return true;
 	}
 
-	bool IsPointOnCylinder(const LibPoint<T>& pt, double eps = Lib::Eps) const {
+	bool IsPointOnCylinder(const LibPoint<T>& pt, double eps = LibEps::eps) const {
 		LibPoint<T> ptClosestToAxis = GetClosestAxisPoint(pt);
 		return LibEps::IsZero((pt - ptClosestToAxis).LengthVector() - Radius());
 	}
@@ -131,22 +132,22 @@ public:
 
 		LibVector<T> ClosestToPt;
 		if (GetNormalInPt(ClosestToPt)) {
-			return ptClosestToAxis + ClosestToPt * Radius();
+			return GetClosestAxisPoint(pt) + ClosestToPt * Radius();
 		}
 	}
 
 private:
-	LibPoint<T> GetClosestAxisPoint(LibPoint<T> pt) {
+	LibPoint<T> GetClosestAxisPoint(const LibPoint<T>& pt) const {
 		LibLine<T> axis(StartPoint(), Direction());
-		return ptClosestToAxis = axis.ClosestPointOnLine(pt);
+		return axis.ClosestPointOnLine(pt);
 	}
 
-	void GetCoordVec(LibVector<T>& n1, LibVector<T>& n2) {
+	void GetCoordVec(LibVector<T>& n1, LibVector<T>& n2) const {
 		n1 = Direction().GetOrtogonalVec();
 		n2 = Direction().CrossProduct(n1);
 	}
 
-	LibPoint<T> GetResForInters(const T prm, const LibLine<T>& locLine, const LibMatrix<T>& globCoord) {
+	LibPoint<T> GetResForInters(const T prm, const LibLine<T>& locLine, const LibMatrix<T>& globCoord) const {
 		LibPoint<T> pt = locLine.Origin() + prm * locLine.Direction();
 		return LibMatrix<T>::MultPt(pt, globCoord);
 	}

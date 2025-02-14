@@ -4,6 +4,7 @@
 #include "LibPoint.h"
 #include "LibVector.h"
 #include "LibMatrix.h"
+#include "LibCylinder.h"
 
 class Tests {
 public:
@@ -262,6 +263,12 @@ public:
 
 		rotX = LibMatrix<double>::RotationX(2 * M_PI);
 		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(pt, tr * rotX * sc) == LibMatrix<double>::MultPt(pt, tr * sc));
+
+
+		LibCylinder<double> cyl(LibPoint<double>(0, 0, 0), LibVector<double>(0, 0, 1), 1);
+		LibLine<double> line(LibPoint<double>(0, 0, 0), LibVector<double>(1, 1, 1));
+
+		std::vector<LibPoint<double>> res = cyl.IsIntersectionLine(line);
 	}
 
 	void RunAllTests() {
