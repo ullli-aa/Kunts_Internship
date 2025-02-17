@@ -67,15 +67,15 @@ public:
 	}
 
 	bool IsPointOnTrngl(const LibPoint<T>& pt) const {
-		LibPlane<T> pln(m_PtFrst, GetNormalTrgngl());
-		if (pln.IsPointOnPlane(pt)) {
-			T fstArea, fsptArea, ftptArea, tsptArea;
-			GetAllArea(pt, fstArea, fsptArea, ftptArea, tsptArea);
+		LibVector<T> AB = m_PtScnd - m_PtFrst;
+		LibVector<T> AC = m_PtThrd - m_PtFrst;
+		LibVector<T> AP = pt - m_PtFrst;
 
-			return LibEps::IsZero(fsptArea + ftptArea + tsptArea - fstArea);
-		}
+		LibVector<T> normal = AB.CrossProduct(AC);
+		double u = normal.DotProduct(AP.CrossProduct(AC)) / normal.DotProduct(normal);
+		double v = normal.DotProduct(AB.CrossProduct(AP)) / normal.DotProduct(normal);
 
-		return false;
+		return u >= 0 && v >= 0 && (1 - u - v) >= 0;
 	}
 
 	bool GetParamByPoint(const LibPoint<T>& pt, double& prmU, double& prmV) const {
