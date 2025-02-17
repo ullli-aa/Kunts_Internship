@@ -72,7 +72,7 @@ public:
 			T fstArea, fsptArea, ftptArea, tsptArea;
 			GetAllArea(pt, fstArea, fsptArea, ftptArea, tsptArea);
 
-			return LibEps<T>::IsZero(fsptArea + ftptArea + tsptArea - fstArea);
+			return LibEps::IsZero(fsptArea + ftptArea + tsptArea - fstArea);
 		}
 
 		return false;

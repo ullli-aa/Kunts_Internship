@@ -5,6 +5,13 @@
 #include "LibVector.h"
 #include "LibMatrix.h"
 #include "LibCylinder.h"
+#include "LibTriangle.h"
+#include "LibLine.h"
+
+typedef LibPoint<double> Pt;
+typedef LibTriangle<double> Trngl;
+typedef LibLine<double> Line;
+typedef LibVector<double> Vec;
 
 class Tests {
 public:
@@ -269,6 +276,49 @@ public:
 		LibLine<double> line(LibPoint<double>(0, 0, 0), LibVector<double>(1, 1, 1));
 
 		std::vector<LibPoint<double>> res = cyl.IsIntersectionLine(line);
+
+		std::cerr << res.size();
+		for (size_t i = 0; i < res.size(); ++i)
+		{
+			LibPoint<double> pt = res[i];
+			std::cerr << pt.X() << ' ' << pt.Y() << ' ' << pt.Z() << '\n';
+		}
+	}
+
+	void TriangleTest_IsPointOnTrngl()
+	{
+		Pt p1(2, 0, 0);
+		Pt p2(2, 5, 0);
+		Pt p3(0, 0, 0);
+		Trngl trngl(p1, p2, p3);
+
+		Pt onTrngl(1, 0, 0);
+		MY_ASSERT_TRUE(trngl.IsPointOnTrngl(onTrngl));
+		MY_ASSERT_TRUE(trngl.IsPointOnTrngl(p1));
+		MY_ASSERT_TRUE(trngl.IsPointOnTrngl(p2));
+		MY_ASSERT_TRUE(trngl.IsPointOnTrngl(p3));
+
+		onTrngl = Pt(1.26, 0.88, 0);
+		MY_ASSERT_TRUE(trngl.IsPointOnTrngl(onTrngl));
+
+		onTrngl = Pt(2.7, 1.49, 0);
+		MY_ASSERT_FALSE(trngl.IsPointOnTrngl(onTrngl));
+	}
+
+	void TriangleTest_IntersLine()
+	{
+		Pt p1(2, 0, 0);
+		Pt p2(2,5, 0);
+		Pt p3(0, 0, 0);
+		Trngl trngl(p1, p2, p3);
+
+		Line line(Pt(0, 0, 1), Vec(1.26, 0.88, -1));
+		Pt inters;
+		MY_ASSERT_TRUE(trngl.IsIntersectionLine(line, inters));
+		MY_ASSERT_VEC_EQ(inters, Pt(1.26, 0.88, 0));
+
+		line = Line(Pt(0, 0, 1), Vec(0.6, 0.2, 0));
+		MY_ASSERT_FALSE(trngl.IsIntersectionLine(line, inters));
 	}
 
 	void RunAllTests() {
@@ -284,6 +334,8 @@ public:
 		RUN_TEST(MatrixTest_Scaling);
 		RUN_TEST(MatrixTest_Rotation);
 		RUN_TEST(MatrixTest_OpCombination);
+		RUN_TEST(TriangleTest_IsPointOnTrngl);
+		RUN_TEST(TriangleTest_IntersLine);
 	}
 };
 

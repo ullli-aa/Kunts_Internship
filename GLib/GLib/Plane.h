@@ -10,7 +10,7 @@ class LibPlane {
 public:
 	LibPlane() = default;
 
-	LibPLane(const LibPoint<T>& pt, const LibVector<T>& vec) :
+	LibPlane(const LibPoint<T>& pt, const LibVector<T>& vec) :
 		m_ptStartPt(pt), m_vecNormal(vec) {};
 
 	~LibPlane() = default;
@@ -66,14 +66,7 @@ public:
 		return StartPoint() + vecA * prmU + vecB * prmV;
 	}
 
-	bool GetNormalInPt(const LibPoint<T>& pt, LibVector<T>& normal) const {
-		if (IsPointOnPlane(pt)) {
-			normal = m_vecNormal;
-		}
-		return false;
-	}
-
-	bool IsPointOnPlane(const LibPoint<T>& pt, double eps = Lib::Eps) const {
+	bool IsPointOnPlane(const LibPoint<T>& pt, double eps = LibEps::eps) const {
 		LibVector<T> vec = pt - m_ptStartPt;
 		return vec.IsOrtogonal(m_vecNormal, eps);
 	}
