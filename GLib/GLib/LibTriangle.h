@@ -67,32 +67,29 @@ public:
 	}
 
 	bool IsPointOnTrngl(const LibPoint<T>& pt) const {
+		double u, v;
+		if (!GetParamByPoint(pt, u, v)) {
+			return false;
+		}
+		return u >= 0 && v >= 0 && (1 - u - v) >= 0;
+	}
+
+	bool GetParamByPoint(const LibPoint<T>& pt, double& prmU, double& prmV) const {
 		LibVector<T> AB = m_PtScnd - m_PtFrst;
 		LibVector<T> AC = m_PtThrd - m_PtFrst;
 		LibVector<T> AP = pt - m_PtFrst;
 
 		LibVector<T> normal = AB.CrossProduct(AC);
-		double u = normal.DotProduct(AP.CrossProduct(AC)) / normal.DotProduct(normal);
-		double v = normal.DotProduct(AB.CrossProduct(AP)) / normal.DotProduct(normal);
-
-		return u >= 0 && v >= 0 && (1 - u - v) >= 0;
-	}
-
-	bool GetParamByPoint(const LibPoint<T>& pt, double& prmU, double& prmV) const {
-		if (!IsPointOnTrngl(pt)) {
-			return false;
+		if (normal.IsParallel(AP.CrossProduct(AB))) {
+			prmU = normal.DotProduct(AP.CrossProduct(AC)) / normal.DotProduct(normal);
+			prmV = normal.DotProduct(AB.CrossProduct(AP)) / normal.DotProduct(normal);
+			return prmU >= 0 && prmV >= 0 && (1 - prmU - prmV) >= 0;;
 		}
-
-		T fstArea, fsptArea, ftptArea, tsptArea;
-		GetAllArea(pt, fstArea, fsptArea, ftptArea, tsptArea);
-
-		prmU = fsptArea / fstArea;
-		prmV = tsptArea / fstArea;
-		return true;
+		return false;
 	}
 
 	LibPoint<T> GetPointByParam(const double prmU, const double prmV) const {
-		return (1 - prmU - prmV) * m_PtFrst + prmU * m_PtScnd + prmV * m_PtThrd;
+		return (1 - prmU - prmV) * m_PtFrst.AsVector() + prmU * m_PtScnd.AsVector() + prmV * m_PtThrd.AsVector();
 	}
 
 private:

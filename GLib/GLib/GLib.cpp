@@ -329,12 +329,14 @@ public:
 
 		onTrngl = Pt(2.7, 1.49, 0);
 		MY_ASSERT_FALSE(trngl.IsPointOnTrngl(onTrngl));
+		onTrngl = Pt(0, 0, 2);
+		MY_ASSERT_FALSE(trngl.IsPointOnTrngl(onTrngl));
 	}
 
 	void TriangleTest_IntersLine()
 	{
 		Pt p1(2, 0, 0);
-		Pt p2(2,5, 0);
+		Pt p2(2, 5, 0);
 		Pt p3(0, 0, 0);
 		Trngl trngl(p1, p2, p3);
 
