@@ -45,6 +45,10 @@ public:
 
 	std::vector<LibPoint<T>> IsIntersectionLine(const LibLine<T>& line) const {
 		std::vector<LibPoint<T>> result;
+		if (line.Direction().IsParallel(Direction())) {
+			return result;
+		}
+
 		LibVector<T> n1, n2;
 		GetCoordVec(n1, n2);
 

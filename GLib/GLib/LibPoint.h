@@ -14,6 +14,10 @@ public:
 
 	~LibPoint() = default;
 
+	LibVector<T>& AsVector() const {
+		return LibVector<T>(m_x, m_y, m_z);
+	}
+
 	T SquareDistanceTo(const LibPoint<T>& other) const
 	{
 		return LibUtility<T>::Square(m_x - other.m_x) +
