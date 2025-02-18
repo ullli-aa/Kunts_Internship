@@ -71,5 +71,8 @@
     <ClInclude Include="LibMatrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibTriangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

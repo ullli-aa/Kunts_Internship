@@ -12,6 +12,7 @@ typedef LibPoint<double> Pt;
 typedef LibTriangle<double> Trngl;
 typedef LibLine<double> Line;
 typedef LibVector<double> Vec;
+typedef LibMatrix<double> Mtrx;
 
 class Tests {
 public:
@@ -270,19 +271,44 @@ public:
 
 		rotX = LibMatrix<double>::RotationX(2 * M_PI);
 		MY_ASSERT_TRUE(LibMatrix<double>::MultPt(pt, tr * rotX * sc) == LibMatrix<double>::MultPt(pt, tr * sc));
+	}
 
+	void MatrixTest_Inverse()
+	{
+		LibMatrix<double> mtrx1 = LibMatrix<double>::IdentityMatrix();
+		auto inverse = mtrx1.InverseCopy();
+		MY_ASSERT_MTRX_EQ(mtrx1, inverse);
 
+		mtrx1.SetNumb(2, 0, 0); mtrx1.SetNumb(3, 1, 1); mtrx1.SetNumb(4, 2, 2); mtrx1.SetNumb(5, 3, 3);
+		inverse.SetNumb(0.5, 0, 0); inverse.SetNumb(0.333333333, 1, 1);
+		inverse.SetNumb(0.25, 2, 2); inverse.SetNumb(0.2, 3, 3);
+		MY_ASSERT_MTRX_EQ(mtrx1.InverseCopy(), inverse);
+
+		MY_ASSERT_TRUE(mtrx1 == mtrx1.InverseCopy().InverseCopy());
+		MY_ASSERT_TRUE(mtrx1 * mtrx1.InverseCopy() == Mtrx::IdentityMatrix());
+	}
+
+	void CylTest_IntersLine()
+	{
 		LibCylinder<double> cyl(LibPoint<double>(0, 0, 0), LibVector<double>(0, 0, 1), 1);
 		LibLine<double> line(LibPoint<double>(0, 0, 0), LibVector<double>(1, 1, 1));
 
-		std::vector<LibPoint<double>> res = cyl.IsIntersectionLine(line);
+		std::vector<Pt> res = cyl.IsIntersectionLine(line);
+		MY_ASSERT_TRUE(res.size() == 2);
+		MY_ASSERT_TRUE(res[0].IsEqual(Pt(0.71, 0.71, 0.71), 1e-2));
+		MY_ASSERT_TRUE(res[1].IsEqual(Pt(-0.71, -0.71, -0.71), 1e-2));
 
-		std::cerr << res.size();
-		for (size_t i = 0; i < res.size(); ++i)
-		{
-			LibPoint<double> pt = res[i];
-			std::cerr << pt.X() << ' ' << pt.Y() << ' ' << pt.Z() << '\n';
-		}
+		line.SetOrigin(Pt(1, 0, 0));
+		line.SetDirection(Vec(0, 1, 0));
+		res = cyl.IsIntersectionLine(line);
+		MY_ASSERT_TRUE(res.size() == 1);
+		MY_ASSERT_VEC_EQ(res[0], Pt(1, 0, 0));
+
+		line.SetOrigin(Pt(2, 2, 0));
+		line.SetDirection(Vec(1, 0, 1));
+		res = cyl.IsIntersectionLine(line);
+		
+		MY_ASSERT_TRUE(res.empty());
 	}
 
 	void TriangleTest_IsPointOnTrngl()
@@ -334,6 +360,8 @@ public:
 		RUN_TEST(MatrixTest_Scaling);
 		RUN_TEST(MatrixTest_Rotation);
 		RUN_TEST(MatrixTest_OpCombination);
+		RUN_TEST(MatrixTest_Inverse);
+		RUN_TEST(CylTest_IntersLine);
 		RUN_TEST(TriangleTest_IsPointOnTrngl);
 		RUN_TEST(TriangleTest_IntersLine);
 	}

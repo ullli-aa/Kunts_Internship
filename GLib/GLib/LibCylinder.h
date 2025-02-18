@@ -50,9 +50,12 @@ public:
 
 		LibMatrix<T> locCoord = LibMatrix<T>::ToCoordinatesInit(n1, n2, Direction(), StartPoint());
 
+		LibVector<T> direction = line.Direction();
+		LibVector<T> pt = LibMatrix<T>::MultVec(direction, locCoord);
+
 		// line to loc coord
 		LibLine<T> locLine = LibLine<T>(LibMatrix<T>::MultPt(line.Origin(), locCoord),
-			LibMatrix<T>::MultVec(line.Direction(), locCoord));
+			pt);
 
 		// look at OXY (x - x0)^2 + (y - y0)^2 = r^2
 		T dx = locLine.Direction().X();
@@ -79,13 +82,16 @@ public:
 
 		LibPoint<T> pt1, pt2;
 
+		if (D == 0) {
+			T t1 = -b / (2 * a);
+			result.push_back(GetResForInters(t1, locLine, globCoord));
+			return result;
+		}
+
 		T t1 = (-b + std::sqrt(D)) / (2 * a);
 		result.push_back(GetResForInters(t1, locLine, globCoord));
-
-		if (D > 0) {
-			T t2 = (-b - std::sqrt(D)) / (2 * a);
-			result.push_back(GetResForInters(t2, locLine, globCoord));
-		}
+		T t2 = (-b - std::sqrt(D)) / (2 * a);
+		result.push_back(GetResForInters(t2, locLine, globCoord));
 
 		return result;
 	}
@@ -143,8 +149,8 @@ private:
 	}
 
 	void GetCoordVec(LibVector<T>& n1, LibVector<T>& n2) const {
-		n1 = Direction().GetOrtogonalVec();
-		n2 = Direction().CrossProduct(n1);
+		n2 = Direction().GetOrtogonalVec();
+		n1 = n2.CrossProduct(Direction());
 	}
 
 	LibPoint<T> GetResForInters(const T prm, const LibLine<T>& locLine, const LibMatrix<T>& globCoord) const {

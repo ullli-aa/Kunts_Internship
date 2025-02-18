@@ -168,7 +168,11 @@ public:
 
 	LibVector<T> GetOrtogonalVec(const double eps = LibEps::eps) const {
 		if (LibEps::IsZero(X())) {
-			return LibVector<T>(0, Z(), -Y());
+			if (!LibEps::IsZero(Y())) {
+				return LibVector<T>(0, Z(), -Y());
+			}
+			return LibVector<T>(0, Z(), 0);
+
 		}
 		return LibVector<T>(Y(), -X(), 0);
 	}

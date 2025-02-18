@@ -144,9 +144,9 @@ public:
 						}
 					}
 				}
-
+				
 				// get cofactor
-				T cofactor = (row + col) % 2 == 0 ? 1 : (-1) * Determinate33(minor);
+				T cofactor = ((row + col) % 2 == 0 ? 1 : (-1)) * Determinate33(minor);
 				cofactors.SetNumb(cofactor, row, col);
 			}
 		}
@@ -251,9 +251,15 @@ public:
 
 	void Print()
 	{
+		int count = 0;
 		for (size_t i = 0; i < 16; i++)
 		{
+			++count;
+			
 			std::cerr << m_data[i] << ' ';
+			if (count % 4 == 0) {
+				std::cerr << '\n';
+			}
 		}
 	}
 protected:
