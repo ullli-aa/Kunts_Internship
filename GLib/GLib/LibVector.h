@@ -71,7 +71,7 @@ public:
 		return LibVector<T>(m_x - other.X(), m_y - other.Y(), m_z - other.Z());
 	};
 
-	bool operator==(const LibVector<T>& other)
+	bool operator==(const LibVector<T>& other) const
 	{
 		return IsEqual(other, LibEps::eps);
 	};

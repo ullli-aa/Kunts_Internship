@@ -74,5 +74,8 @@
     <ClInclude Include="LibTriangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

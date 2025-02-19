@@ -7,12 +7,15 @@
 #include "LibCylinder.h"
 #include "LibTriangle.h"
 #include "LibLine.h"
+#include "LibModel.h"
 
 typedef LibPoint<double> Pt;
 typedef LibTriangle<double> Trngl;
 typedef LibLine<double> Line;
 typedef LibVector<double> Vec;
 typedef LibMatrix<double> Mtrx;
+typedef LibModel<double> Model;
+typedef LibModel<double>::Surface Srfc;
 
 class Tests {
 public:
@@ -349,6 +352,38 @@ public:
 		MY_ASSERT_FALSE(trngl.IsIntersectionLine(line, inters));
 	}
 
+	void ModelTest_CreateCube()
+	{
+		Pt center(0.5, 0.5, 0.5);
+		Model cube;
+		cube.CreateCube(center, 1.0);
+
+		std::vector<Pt> points = cube.Points();
+		Pt A(1, 0, 0); Pt B(1, 0, 1); Pt C(1, 1, 1); Pt D(1, 1, 0);
+		Pt G(0, 0, 0); Pt E(0, 0, 1); Pt F(0, 1, 1); Pt K(0, 1, 0);
+		std::vector<Pt> expPt = { A, D, C, B, D, K, F, C, K, G, E, F, G, A, B, E, B, C, F, E, G, K, D, A };
+		MY_ASSERT_EQ(expPt, points);
+
+		std::vector<Vec> normals = cube.Normals();
+		Vec nrml1(1, 0, 0); Vec nrml2(0, 1, 0); Vec nrml3(-1, 0, 0);
+		Vec nrml4(0, -1, 0); Vec nrml5(0, 0, 1); Vec nrml6(0, 0, -1);
+		std::vector<Vec> expNrml = { nrml1, nrml1, nrml1, nrml1, nrml2, nrml2, nrml2, nrml2,
+						nrml3, nrml3, nrml3, nrml3, nrml4, nrml4, nrml4, nrml4,
+						nrml5, nrml5, nrml5, nrml5, nrml6, nrml6, nrml6, nrml6 };
+		MY_ASSERT_EQ(expNrml, normals);
+
+		std::vector<Srfc> surfaces = cube.Surfaces();
+		std::vector<Srfc> expSrfc = { Srfc(cube, 0, 4), Srfc(cube, 4, 8), Srfc(cube, 8, 12),
+			Srfc(cube, 12, 16), Srfc(cube, 16, 20), Srfc(cube, 20, 24) };
+		MY_ASSERT_EQ(expSrfc, surfaces);
+
+		std::vector<int> triangles = cube.Triangles();
+		std::vector<int> expTr = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
+		12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+		MY_ASSERT_EQ(expTr, triangles);
+
+	}
+
 	void RunAllTests() {
 		RUN_TEST(PointTest_DistanceTo);
 		RUN_TEST(PointTest_Operators);
@@ -366,6 +401,7 @@ public:
 		RUN_TEST(CylTest_IntersLine);
 		RUN_TEST(TriangleTest_IsPointOnTrngl);
 		RUN_TEST(TriangleTest_IntersLine);
+		RUN_TEST(ModelTest_CreateCube);
 	}
 };
 

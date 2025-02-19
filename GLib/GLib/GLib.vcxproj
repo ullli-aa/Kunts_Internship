@@ -150,6 +150,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LibCylinder.h" />
+    <ClInclude Include="LibModel.h" />
     <ClInclude Include="LibSegment.h" />
     <ClInclude Include="LibEps.h" />
     <ClInclude Include="LibLine.h" />
