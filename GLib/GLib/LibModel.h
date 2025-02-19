@@ -4,6 +4,7 @@
 #include "LibPoint.h"
 #include "LibVector.h"
 #include "LibTriangle.h"
+#include "LibRay.h"
 
 template<typename T>
 class LibModel
@@ -124,7 +125,39 @@ public:
 		}
 	}
 
+	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
+		T dist = DBL_MAX;
+		int ind = 0;
+		LibPoint<T> intersPt;
+		for (size_t i = 0; i < m_vecTriangles.size(); i += 3) {
+			LibTriangle<T> trngl(m_vecPoints[m_vecTriangles[i]],
+				m_vecPoints[m_vecTriangles[i + 1]],
+				m_vecPoints[m_vecTriangles[i + 2]]);
+			if (trngl.IsIntersectionLine(ray, intersPt)) {
+				T curDist = intersPt.DistanceTo(ray.Origin());
+				if (curDist < dist) {
+					dist = curDist;
+					ind = i / 3 + 1;
+					pt = intersPt;
+				}
+			}
+		}
+
+		srfc = FindSurfForTrngl(ind);
+	}
+	
 private:
+	Surface& FindSurfForTrngl(int ind) const {
+		for (const Surface& surf : m_vecSurfaces) {
+			if (surf.End() - surf.Begin() < ind) {
+				ind -= surf.End() - surf.Begin();
+			}
+			else {
+				return surf;
+			}
+		}
+	}
+
 	std::vector<LibPoint<T>> m_vecPoints;
 	std::vector<LibVector<T>> m_vecNormals;
 	std::vector<int> m_vecTriangles;

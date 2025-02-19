@@ -8,6 +8,7 @@
 #include "LibTriangle.h"
 #include "LibLine.h"
 #include "LibModel.h"
+#include "LibRay.h"
 
 typedef LibPoint<double> Pt;
 typedef LibTriangle<double> Trngl;
@@ -16,6 +17,7 @@ typedef LibVector<double> Vec;
 typedef LibMatrix<double> Mtrx;
 typedef LibModel<double> Model;
 typedef LibModel<double>::Surface Srfc;
+typedef LibRay<double> Ray;
 
 class Tests {
 public:
@@ -381,7 +383,14 @@ public:
 		std::vector<int> expTr = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
 		12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
 		MY_ASSERT_EQ(expTr, triangles);
+	}
 
+	void ModelTest_IntersRay() {
+		Pt center(0.5, 0.5, 0.5);
+		Model cube;
+		cube.CreateCube(center, 1.0);
+
+		Ray ray(Pt(1.22, 2, 1.5), Vec(-1.72, -2, -1.5));
 	}
 
 	void RunAllTests() {

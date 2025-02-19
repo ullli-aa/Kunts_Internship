@@ -1,10 +1,19 @@
 # Visual Studio
 .vs/
-bin/
-obj/
+*.sln
 *.user
+*.userprefs
 *.suo
-*.sln.docstates
+*.ncb
+*.aps
+*.pch
+*.idb
+*.opendb
+*.tlog
+*.log
+ipch/
+obj/
+bin/
 
 # Другие временные файлы
 *.tmp
