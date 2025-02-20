@@ -108,6 +108,7 @@ public:
 
 	void CreateCube(LibPoint<T> center, T length)
 	{
+		Clear();
 		T x = center.X(); T y = center.Y(); T z = center.Z();
 		T halfLen = length / 2;
 
@@ -139,22 +140,52 @@ public:
 						nrml3, nrml3, nrml3, nrml3, nrml4, nrml4, nrml4, nrml4,
 						nrml5, nrml5, nrml5, nrml5, nrml6, nrml6, nrml6, nrml6 };
 
-		m_vecSurfaces.clear();
 		for (size_t i = 0; i < m_vecPoints.size(); i += 4)
 		{
 			m_vecSurfaces.push_back(Surface(*this, i, i + 4));
 		}
 
-		m_vecTriangles.clear();
-		for (auto& surface : m_vecSurfaces)
+		MakeTriangles();
+	}
+
+	void GreateCylinder(const LibPoint<T>& pt_Origin,
+		const LibVector<T>& vec_Direction, T Radius, T Height, T ChordTolerance) {
+		Clear();
+		T angle = std::cos((Radius - ChordTolerance) / Radius) * 2;
+
+		LibVector<T> CirclDir = vec_Direction.GetOrtogonalVec().GetNormalize();
+		LibPoint<T> pt_OnCircle = pt_Origin + CirclDir * Radius;
+
+		LibMatrix<T> mtrx_Rotation = LibMatrix<T>::Rotation(vec_Direction(), angle);
+
+		GetCirclePoints(pt_OnCircle, mtrx_Rotation, -1);
+
+		pt_OnCircle = pt_Origin + nrmlDirection * Height + CirclDir * Radius;
+		GetCirclePoints(pt_OnCircle, mtrx_Rotation, 1);
+
+		LibCylinder<T> cylndr(pt_Origin, vec_Direction, Radius);
+
+		for (size_t i = 0; i < m_vecPoints.size() / 2; i++)
 		{
-			for (size_t i = surface.Begin() + 1; i < surface.End() - 1; i++)
-			{
-				m_vecTriangles.push_back(surface.Begin());
-				m_vecTriangles.push_back(i);
-				m_vecTriangles.push_back(i + 1);
-			}
+			m_vecPoints.push_back(m_vecPoints[i]);
+			m_vecPoints.push_back(m_vecPoints[i + 1]);
+			m_vecPoints.push_back(m_vecPoints[i + pt_OnCircle]);
+			m_vecPoints.push_back(m_vecPoints[i + pt_OnCircle + 1]);
+
+			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i]]);
+			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i + 1]]);
+			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i + pt_OnCircle]]);
+			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i + pt_OnCircle + 1]]);
+
+			m_vecTriangles.push_back(m_vecPoints[i]);
+			m_vecTriangles.push_back(m_vecPoints[i + 1]);
+			m_vecTriangles.push_back(m_vecPoints[i + pt_OnCircle]);
+
+			m_vecTriangles.push_back(m_vecPoints[i]);
+			m_vecTriangles.push_back(m_vecPoints[i + pt_onCircle]);
+			m_vecTriangles.push_back(m_vecPoints[i + pt_OnCircle + 1]);
 		}
+
 	}
 
 	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
@@ -182,7 +213,19 @@ public:
 		return true;
 	}
 	
-private:
+protected:
+	void MakeTriangles() {
+		for (auto& surface : m_vecSurfaces)
+		{
+			for (size_t i = surface.Begin() + 1; i < surface.End() - 1; i++)
+			{
+				m_vecTriangles.push_back(surface.Begin());
+				m_vecTriangles.push_back(i);
+				m_vecTriangles.push_back(i + 1);
+			}
+		}
+	}
+
 	const Surface& FindSurfForTrngl(int ind) const {
 		for (const Surface& surf : m_vecSurfaces) {
 			if (surf.End() - surf.Begin() - 2 < ind) {
@@ -194,6 +237,26 @@ private:
 		}
 	}
 
+	void GetCirclePoints(LibPoint<T>& pt_OnCircle, const LibMatrix<T>& mtrx_Rotation, T dirCoef) {
+		int pntsCountOnCrcl = 2 * M_PI / angle;
+		LibVector<T> nrmlDirection = vec_Direction.GetNormalize();
+		for (int i = 0; i < pntsCountOnCrcl; i++)
+		{
+			pt_OnCircle = LibMatrix<T>::MultPt(pt_OnCircle, mtrx_Rotation);
+			m_vecPoints.push_back(pt_OnCircle);
+			m_vecNormals.push_back((dirCoef) * nrmlDirection);
+		}
+		m_vecSurfaces.push_back(m_vecSurfaces.size(), m_vecSurfaces.size() + pntsCountOnCrcl);
+	}
+
+	void Clear() {
+		m_vecPoints.clear();
+		m_vecNormals.clear();
+		m_vecTriangles.clear();
+		m_vecSurfaces.clear();
+	}
+
+private:
 	std::vector<LibPoint<T>> m_vecPoints;
 	std::vector<LibVector<T>> m_vecNormals;
 	std::vector<int> m_vecTriangles;
