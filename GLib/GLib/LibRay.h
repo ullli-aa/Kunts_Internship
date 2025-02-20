@@ -7,16 +7,20 @@ template<typename T>
 class LibRay : public LibLine<T>
 {
 public:
+	LibRay(const LibPoint<T>& ptOrigin, const LibVector<T>& vecDirection)
+		: LibLine<T>(ptOrigin, vecDirection) {}
+
 	bool IsIntersectionLine(const LibLine<T>& lnOther, LibPoint<T>& intersPoint) const override
 	{
 		T coefR, coefL;
-		if (GetIntersParam(lnOther, coefR, coefL))
+		if (this->GetIntersParam(lnOther, coefR, coefL))
 		{
 			if (coefR < 0)
 			{
 				return false;
 			}
-			return GetIntersection(coefR);
+			LibPoint<T> intersPoint;
+			return this->GetIntersection(coefR, intersPoint);
 		}
 		return false;
 	};
@@ -24,7 +28,7 @@ public:
 	bool IsIntersectionRay(const LibRay<T>& lnOther, LibPoint<T>& intersPoint) const
 	{
 		T coef1, coef2;
-		if (GetIntersParam(lnOther, coefR, coefL))
+		if (GetIntersParam(lnOther, coef1, coef2))
 		{
 			if (coef1 >= 0 && coef2 >= 0)
 			{
@@ -36,15 +40,15 @@ public:
 
 	LibPoint<T> ClosestPointOnLine(const LibPoint<T>& point) const override
 	{
-		double projectionLength = GetCoefClosestPoint(point);
+		double projectionLength = this->GetCoefClosestPoint(point);
 		if (projectionLength < 0)
 		{
 			return this->Origin();
 		}
-		return GetClosestPoint(coef);
+		return this->GetClosestPoint(projectionLength);
 	};
 
-	bool IsPointOnLine(const LibPoint<T>& point) const override
+	bool IsPointOnLine(const LibPoint<T>& point, double eps = LibEps::eps) const override
 	{
 		LibVector<T> vec = LibVector<T>(point - this->Origin());
 		return !vec.IsOpposite(this->Direction()) && vec.LengthVector() >= 0;

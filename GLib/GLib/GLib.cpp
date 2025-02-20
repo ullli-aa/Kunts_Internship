@@ -155,6 +155,29 @@ public:
 		MY_ASSERT_TRUE(result.IsZero());
 	}
 
+	void LineTest_Basic() {
+		Line line1(Pt(0, 0, 0), Vec(1, 0, 0));
+		Line line2(Pt(0, 0, 0), Vec(1, 1, 0));
+		MY_ASSERT_TRUE(LibEps::IsZero(line1.AngleBetweenLines(line2) - M_PI / 4));
+		MY_ASSERT_FALSE(line1.IsParallel(line2));
+
+		line2.SetDirection(Vec(3, 0, 0));
+		MY_ASSERT_TRUE(LibEps::IsZero(line1.AngleBetweenLines(line2)));
+		MY_ASSERT_TRUE(line1.IsParallel(line2));
+
+		line2.SetDirection(Vec(-2, 0, 0));
+		MY_ASSERT_TRUE(LibEps::IsZero(line1.AngleBetweenLines(line2) - M_PI));
+		MY_ASSERT_TRUE(line1.IsOpposite(line2));
+
+		line2.SetDirection(Vec(0, 1, 0));
+		MY_ASSERT_TRUE(LibEps::IsZero(line1.AngleBetweenLines(line2) - M_PI / 2));
+		MY_ASSERT_TRUE(line1.IsOrtogonal(line2));
+
+		line2 = Line(Pt(0, 1, 0), Vec(0, 0, 1));
+		MY_ASSERT_FALSE(line1.IsSkew(line2));
+
+	}
+
 	void MatrixTest_Equal()
 	{
 		LibMatrix<double> mtrx1 = LibMatrix<double>::IdentityMatrix();
@@ -391,6 +414,15 @@ public:
 		cube.CreateCube(center, 1.0);
 
 		Ray ray(Pt(1.22, 2, 1.5), Vec(-1.72, -2, -1.5));
+		Pt pt; Srfc srfc(cube);
+
+		MY_ASSERT_TRUE(cube.IsIntersectionRay(ray, pt, srfc));
+		MY_ASSERT_VEC_EQ(Pt(0.36, 1, 0.75), pt);
+		MY_ASSERT_EQ(Srfc(cube, 4, 8), srfc);
+
+		ray.SetOrigin(Pt(0, 3, 1.5));
+		ray.SetDirection(Vec(-0.5, -3, -1.5));
+		MY_ASSERT_FALSE(cube.IsIntersectionRay(ray, pt, srfc));
 	}
 
 	void RunAllTests() {
@@ -401,6 +433,7 @@ public:
 		RUN_TEST(VecTest_EqOperators);
 		RUN_TEST(VecTest_ScalarMultOperator);
 		RUN_TEST(VecTest_ScalarDivOperator);
+		RUN_TEST(LineTest_Basic);
 		RUN_TEST(MatrixTest_Equal);
 		RUN_TEST(MatrixTest_Translation);
 		RUN_TEST(MatrixTest_Scaling);
@@ -411,6 +444,7 @@ public:
 		RUN_TEST(TriangleTest_IsPointOnTrngl);
 		RUN_TEST(TriangleTest_IntersLine);
 		RUN_TEST(ModelTest_CreateCube);
+		RUN_TEST(ModelTest_IntersRay);
 	}
 };
 

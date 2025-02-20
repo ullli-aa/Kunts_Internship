@@ -56,7 +56,8 @@ public:
 
 	bool IsSkew(const LibLine<T>& lnOther) const
 	{
-		bool inters = IsIntersectionLine(lnOther);
+		LibPoint<T> pt;
+		bool inters = IsIntersectionLine(lnOther, pt);
 		return !IsParallel(lnOther) && !inters;
 	};
 

@@ -15,8 +15,23 @@ public:
 	public:
 		Surface() = default;
 
-		Surface(const LibModel<T>& model, size_t begin, size_t end) :
-		m_model(model), m_begin(begin), m_end(end) { }
+		Surface(LibModel<T>& model) : 
+			m_model(model), m_begin(0), m_end(0) {};
+
+		Surface(LibModel<T>& model, size_t begin, size_t end) :
+			m_model(model), m_begin(begin), m_end(end) { }
+
+		Surface(const Surface& other)
+			: m_model(other.m_model), m_begin(other.m_begin), m_end(other.m_end) {}
+
+		Surface& operator=(const Surface& other) {
+			if (this != &other) {
+				m_model = other.m_model;
+				m_begin = other.m_begin;
+				m_end = other.m_end;
+			}
+			return *this;
+		}
 
 		inline LibModel<T> Model() const
 		{
@@ -41,7 +56,7 @@ public:
 		}
 
 	private:
-		const LibModel<T>& m_model;
+		LibModel<T>& m_model;
 		size_t m_begin;
 		size_t m_end;
 	};
@@ -52,7 +67,24 @@ public:
 		const std::vector<int>& triangles, std::vector<Surface> surfaces) :
 		m_vecPoints(pts), m_vecNormals(normals), m_vecTriangles(triangles), m_vecSurfaces(surfaces) {}
 
+	LibModel(const LibModel<T>& other) :
+		m_vecPoints(other.m_vecPoints),
+		m_vecNormals(other.m_vecNormals),
+		m_vecTriangles(other.m_vecTriangles),
+		m_vecSurfaces(other.m_vecSurfaces) {}
+
 	~LibModel() = default;
+
+	LibModel<T>& operator=(const LibModel<T>& other) {
+		if (this != &other) {
+			m_vecPoints = other.m_vecPoints;
+			m_vecNormals = other.m_vecNormals;
+			m_vecTriangles = other.m_vecTriangles;
+			m_vecSurfaces = other.m_vecSurfaces;
+		}
+		return *this;
+	}
+
 
 	inline std::vector<LibPoint<T>> Points() const
 	{
@@ -143,14 +175,18 @@ public:
 			}
 		}
 
+		if (dist == DBL_MAX) {
+			return false;
+		}
 		srfc = FindSurfForTrngl(ind);
+		return true;
 	}
 	
 private:
-	Surface& FindSurfForTrngl(int ind) const {
+	const Surface& FindSurfForTrngl(int ind) const {
 		for (const Surface& surf : m_vecSurfaces) {
-			if (surf.End() - surf.Begin() < ind) {
-				ind -= surf.End() - surf.Begin();
+			if (surf.End() - surf.Begin() - 2 < ind) {
+				ind -= surf.End() - surf.Begin() - 2;
 			}
 			else {
 				return surf;

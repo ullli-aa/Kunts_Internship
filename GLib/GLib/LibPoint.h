@@ -9,7 +9,7 @@ template<typename T>
 class LibPoint {
 public:
 	LibPoint() : m_x(0.0), m_y(0.0), m_z(0.0) {};
-	LibPoint(T x, T y) : m_x(x), m_y(y) {};
+	LibPoint(T x, T y) : m_x(x), m_y(y), m_z(0.0) {};
 	LibPoint(T x, T y, T z) : m_x(x), m_y(y), m_z(z) {};;
 
 	~LibPoint() = default;
