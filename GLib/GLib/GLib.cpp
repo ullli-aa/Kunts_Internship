@@ -380,8 +380,7 @@ public:
 	void ModelTest_CreateCube()
 	{
 		Pt center(0.5, 0.5, 0.5);
-		Model cube;
-		cube.CreateCube(center, 1.0);
+		Model cube(Model::CreateCube(center, 1.0));
 
 		std::vector<Pt> points = cube.Points();
 		Pt A(1, 0, 0); Pt B(1, 0, 1); Pt C(1, 1, 1); Pt D(1, 1, 0);
@@ -398,27 +397,26 @@ public:
 		MY_ASSERT_EQ(expNrml, normals);
 
 		std::vector<Srfc> surfaces = cube.Surfaces();
-		std::vector<Srfc> expSrfc = { Srfc(cube, 0, 4), Srfc(cube, 4, 8), Srfc(cube, 8, 12),
-			Srfc(cube, 12, 16), Srfc(cube, 16, 20), Srfc(cube, 20, 24) };
+		std::vector<Srfc> expSrfc = { Srfc(0, 2), Srfc(2, 4), Srfc(4, 6),
+			Srfc(6, 8), Srfc(8, 10), Srfc(10, 12) };
 		MY_ASSERT_EQ(expSrfc, surfaces);
 
-		std::vector<int> triangles = cube.Triangles();
-		std::vector<int> expTr = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
+		std::vector<size_t> triangles = cube.Triangles();
+		std::vector<size_t> expTr = { 0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11,
 		12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
 		MY_ASSERT_EQ(expTr, triangles);
 	}
 
 	void ModelTest_IntersRay() {
 		Pt center(0.5, 0.5, 0.5);
-		Model cube;
-		cube.CreateCube(center, 1.0);
+		Model cube = Model::CreateCube(center, 1.0);
 
 		Ray ray(Pt(1.22, 2, 1.5), Vec(-1.72, -2, -1.5));
-		Pt pt; Srfc srfc(cube);
+		Pt pt; Srfc srfc;
 
 		MY_ASSERT_TRUE(cube.IsIntersectionRay(ray, pt, srfc));
 		MY_ASSERT_VEC_EQ(Pt(0.36, 1, 0.75), pt);
-		MY_ASSERT_EQ(Srfc(cube, 4, 8), srfc);
+		MY_ASSERT_EQ(Srfc(2, 4), srfc);
 
 		ray.SetOrigin(Pt(0, 3, 1.5));
 		ray.SetDirection(Vec(-0.5, -3, -1.5));

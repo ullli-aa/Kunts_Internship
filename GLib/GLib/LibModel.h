@@ -15,28 +15,8 @@ public:
 	public:
 		Surface() = default;
 
-		Surface(LibModel<T>& model) : 
-			m_model(model), m_begin(0), m_end(0) {};
-
-		Surface(LibModel<T>& model, size_t begin, size_t end) :
-			m_model(model), m_begin(begin), m_end(end) { }
-
-		Surface(const Surface& other)
-			: m_model(other.m_model), m_begin(other.m_begin), m_end(other.m_end) {}
-
-		Surface& operator=(const Surface& other) {
-			if (this != &other) {
-				m_model = other.m_model;
-				m_begin = other.m_begin;
-				m_end = other.m_end;
-			}
-			return *this;
-		}
-
-		inline LibModel<T> Model() const
-		{
-			return m_model;
-		}
+		Surface(size_t begin, size_t end) :
+			 m_begin(begin), m_end(end) { }
 
 		inline size_t Begin() const
 		{
@@ -51,12 +31,10 @@ public:
 		bool operator==(const Surface& other) const
 		{
 			return (m_begin == other.m_begin) &&
-				(m_end == other.m_end) &&
-				(&m_model == &other.m_model);
+				(m_end == other.m_end);
 		}
 
 	private:
-		LibModel<T>& m_model;
 		size_t m_begin;
 		size_t m_end;
 	};
@@ -64,51 +42,33 @@ public:
 	LibModel() = default;
 
 	LibModel(const std::vector<LibPoint<T>>& pts, const std::vector<LibVector<T>>& normals,
-		const std::vector<int>& triangles, std::vector<Surface> surfaces) :
+		const std::vector<size_t>& triangles, const std::vector<Surface>& surfaces) :
 		m_vecPoints(pts), m_vecNormals(normals), m_vecTriangles(triangles), m_vecSurfaces(surfaces) {}
-
-	LibModel(const LibModel<T>& other) :
-		m_vecPoints(other.m_vecPoints),
-		m_vecNormals(other.m_vecNormals),
-		m_vecTriangles(other.m_vecTriangles),
-		m_vecSurfaces(other.m_vecSurfaces) {}
 
 	~LibModel() = default;
 
-	LibModel<T>& operator=(const LibModel<T>& other) {
-		if (this != &other) {
-			m_vecPoints = other.m_vecPoints;
-			m_vecNormals = other.m_vecNormals;
-			m_vecTriangles = other.m_vecTriangles;
-			m_vecSurfaces = other.m_vecSurfaces;
-		}
-		return *this;
-	}
-
-
-	inline std::vector<LibPoint<T>> Points() const
+	inline const std::vector<LibPoint<T>>& Points() const
 	{
 		return m_vecPoints;
 	}
 
-	inline std::vector<LibVector<T>> Normals() const
+	inline const std::vector<LibVector<T>>& Normals() const
 	{
 		return m_vecNormals;
 	}
 
-	inline std::vector<int> Triangles() const
+	inline const std::vector<size_t>& Triangles() const
 	{
 		return m_vecTriangles;
 	}
 
-	inline std::vector<Surface> Surfaces() const
+	inline const std::vector<Surface>& Surfaces() const
 	{
 		return m_vecSurfaces;
 	}
 
-	void CreateCube(LibPoint<T> center, T length)
+	static LibModel<T> CreateCube(const LibPoint<T>& center, T length)
 	{
-		Clear();
 		T x = center.X(); T y = center.Y(); T z = center.Z();
 		T halfLen = length / 2;
 
@@ -121,8 +81,8 @@ public:
 		LibPoint<T> F(x - halfLen, y + halfLen, z + halfLen);
 		LibPoint<T> K(x - halfLen, y + halfLen, z - halfLen);
 
-		m_vecPoints = std::vector<LibPoint<T>>{ A, D, C, B, D, K, F, C, K, G, E, F, G, A, B, E, B, C, F, E, G, K, D, A };
-
+		std::vector<LibPoint<T>> vecPoints = std::vector<LibPoint<T>>{A, D, C, B, D, K, F, C, K, G, E, F, G, A, B, E, B, C, F, E, G, K, D, A};
+		std::cerr << vecPoints.size();
 		LibVector<T> AB = B - A;
 		LibVector<T> DA = A - D;
 		LibVector<T> KD = D - K;
@@ -132,65 +92,91 @@ public:
 
 		LibVector<T> nrml1 = AB.CrossProduct(DA);
 		LibVector<T> nrml2 = KD.CrossProduct(FK);
-		LibVector<T> nrml3 = EF.CrossProduct(FK);
-		LibVector<T> nrml4 = AB.CrossProduct(EB);
-		LibVector<T> nrml5 = EB.CrossProduct(EF);
-		LibVector<T> nrml6 = DA.CrossProduct(KD);
-		m_vecNormals = std::vector<LibVector<T>>{ nrml1, nrml1, nrml1, nrml1, nrml2, nrml2, nrml2, nrml2,
-						nrml3, nrml3, nrml3, nrml3, nrml4, nrml4, nrml4, nrml4,
-						nrml5, nrml5, nrml5, nrml5, nrml6, nrml6, nrml6, nrml6 };
+		LibVector<T> nrml3 = EB.CrossProduct(EF);
+		std::vector<LibVector<T>> vecNormals = std::vector<LibVector<T>>{nrml1, nrml1, nrml1, nrml1,
+						nrml2, nrml2, nrml2, nrml2,
+						nrml1 * (-1), nrml1 * (-1), nrml1 * (-1), nrml1 * (-1),
+						nrml2 * (-1), nrml2 * (-1), nrml2 * (-1), nrml2 * (-1),
+						nrml3, nrml3, nrml3, nrml3,
+						nrml3 * (-1), nrml3 * (-1), nrml3 * (-1), nrml3 * (-1)};
 
-		for (size_t i = 0; i < m_vecPoints.size(); i += 4)
+		std::vector<Surface> vecSurfaces = {Surface(0, 2), Surface(2, 4), Surface(4, 6),
+						Surface(6, 8), Surface(8, 10),Surface(10, 12) };
+
+		std::vector<size_t> vecTriangles;
+		for (size_t i = 0; i < vecPoints.size(); i += 4)
 		{
-			m_vecSurfaces.push_back(Surface(*this, i, i + 4));
+			vecTriangles.push_back(i);
+			vecTriangles.push_back(i + 1);
+			vecTriangles.push_back(i + 2);
+
+			vecTriangles.push_back(i);
+			vecTriangles.push_back(i + 2);
+			vecTriangles.push_back(i + 3);
 		}
 
-		MakeTriangles();
+		LibModel<T> model(vecPoints, vecNormals, vecTriangles, vecSurfaces);
+		return model;
 	}
 
-	void GreateCylinder(const LibPoint<T>& pt_Origin,
+	static LibModel<T>& GreateCylinder(const LibPoint<T>& pt_Origin,
 		const LibVector<T>& vec_Direction, T Radius, T Height, T ChordTolerance) {
-		Clear();
+		std::vector<LibPoint<T>> vecPoints;
+		std::vector<LibVector<T>> vecNormals;
+		std::vector<size_t> vecTriangles;
+		std::vector<Surface> vecSurfaces;
+
 		T angle = std::cos((Radius - ChordTolerance) / Radius) * 2;
 
-		LibVector<T> CirclDir = vec_Direction.GetOrtogonalVec().GetNormalize();
-		LibPoint<T> pt_OnCircle = pt_Origin + CirclDir * Radius;
+		GetCirclePoints(vecPoints, vecNormals, vecTriangles, vecSurfaces,
+			pt_Origin, vec_Direction, Radius, angle, -1);
 
-		LibMatrix<T> mtrx_Rotation = LibMatrix<T>::Rotation(vec_Direction(), angle);
-
-		GetCirclePoints(pt_OnCircle, mtrx_Rotation, -1);
-
-		pt_OnCircle = pt_Origin + nrmlDirection * Height + CirclDir * Radius;
-		GetCirclePoints(pt_OnCircle, mtrx_Rotation, 1);
+		LibVector<T> nrmlDirection = vec_Direction.GetNormalize();
+		LibPoint<T> pt_UpOrigin = pt_Origin + nrmlDirection * Height;
+		GetCirclePoints(vecPoints, vecNormals, vecTriangles, vecSurfaces, 
+			pt_UpOrigin, vec_Direction, Radius, angle, 1);
 
 		LibCylinder<T> cylndr(pt_Origin, vec_Direction, Radius);
+		int pntsCountOnCrcl = (vecPoints.size() - 2) / 2;
+		int trnglCount = vecPoints.size() / 2;
 
-		for (size_t i = 0; i < m_vecPoints.size() / 2; i++)
+		for (size_t i = 1; i < vecPoints.size() / 2; i++)
 		{
-			m_vecPoints.push_back(m_vecPoints[i]);
-			m_vecPoints.push_back(m_vecPoints[i + 1]);
-			m_vecPoints.push_back(m_vecPoints[i + pt_OnCircle]);
-			m_vecPoints.push_back(m_vecPoints[i + pt_OnCircle + 1]);
+			LibPoint<T> A = vecPoints[i];
+			LibPoint<T> B = vecPoints[i % pntsCountOnCrcl + 1];
+			LibPoint<T> C = vecPoints[i % pntsCountOnCrcl + pntsCountOnCrcl + 2];
+			LibPoint<T> D = vecPoints[i + pntsCountOnCrcl + 1];
+			vecPoints.push_back(A);
+			vecPoints.push_back(B);
+			vecPoints.push_back(C);
+			vecPoints.push_back(D);
 
-			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i]]);
-			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i + 1]]);
-			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i + pt_OnCircle]]);
-			m_vecNormals.push_back(cylndr.GetNormalInPt[m_vecPoints[i + pt_OnCircle + 1]]);
+			LibVector<T> normal1, normal2;
+			cylndr.GetNormalInPt(A, normal1);
+			cylndr.GetNormalInPt(B, normal2);
 
-			m_vecTriangles.push_back(m_vecPoints[i]);
-			m_vecTriangles.push_back(m_vecPoints[i + 1]);
-			m_vecTriangles.push_back(m_vecPoints[i + pt_OnCircle]);
+			vecNormals.push_back(normal1);
+			vecNormals.push_back(normal2);
+			vecNormals.push_back(normal2);
+			vecNormals.push_back(normal1);
 
-			m_vecTriangles.push_back(m_vecPoints[i]);
-			m_vecTriangles.push_back(m_vecPoints[i + pt_onCircle]);
-			m_vecTriangles.push_back(m_vecPoints[i + pt_OnCircle + 1]);
+			vecTriangles.push_back(A);
+			vecTriangles.push_back(B);
+			vecTriangles.push_back(C);
+
+			vecTriangles.push_back(A);
+			vecTriangles.push_back(C);
+			vecTriangles.push_back(D);
 		}
+		vecSurfaces.push_back(Surface(trnglCount, vecTriangles.size()));
 
+		LibModel<T> model(vecPoints, vecNormals, vecTriangles, vecSurfaces);
+		return model;
 	}
 
 	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
 		T dist = DBL_MAX;
-		int ind = 0;
+		size_t ind = 0;
 		LibPoint<T> intersPt;
 		for (size_t i = 0; i < m_vecTriangles.size(); i += 3) {
 			LibTriangle<T> trngl(m_vecPoints[m_vecTriangles[i]],
@@ -200,7 +186,7 @@ public:
 				T curDist = intersPt.DistanceTo(ray.Origin());
 				if (curDist < dist) {
 					dist = curDist;
-					ind = i / 3 + 1;
+					ind = i / 3;
 					pt = intersPt;
 				}
 			}
@@ -212,53 +198,56 @@ public:
 		srfc = FindSurfForTrngl(ind);
 		return true;
 	}
+
+	const LibPoint<T>& FindTrnglPt(size_t ind, size_t pos) {
+		return m_vecPoints[m_vecTriangles[ind * 3 + pos]];
+	}
 	
 protected:
-	void MakeTriangles() {
-		for (auto& surface : m_vecSurfaces)
-		{
-			for (size_t i = surface.Begin() + 1; i < surface.End() - 1; i++)
-			{
-				m_vecTriangles.push_back(surface.Begin());
-				m_vecTriangles.push_back(i);
-				m_vecTriangles.push_back(i + 1);
-			}
-		}
-	}
-
-	const Surface& FindSurfForTrngl(int ind) const {
+	const Surface& FindSurfForTrngl(size_t ind) const {
 		for (const Surface& surf : m_vecSurfaces) {
-			if (surf.End() - surf.Begin() - 2 < ind) {
-				ind -= surf.End() - surf.Begin() - 2;
-			}
-			else {
+			if (ind >= surf.Begin() && ind < surf.End()) {
 				return surf;
 			}
 		}
 	}
 
-	void GetCirclePoints(LibPoint<T>& pt_OnCircle, const LibMatrix<T>& mtrx_Rotation, T dirCoef) {
+	void GetCirclePoints(std::vector<LibPoint<T>>& vecPoints, std::vector<LibVector<T>>& vecNormals,
+		std::vector<size_t>& vecTriangles, std::vector<Surface>& vecSurfaces,
+		const LibPoint<T>& pt_Center, const LibVector<T>& vec_Direction,
+		T Radius, T angle, T dirCoef) 
+	{
 		int pntsCountOnCrcl = 2 * M_PI / angle;
-		LibVector<T> nrmlDirection = vec_Direction.GetNormalize();
+		size_t trnglsCount = vecTriangles.size() / 3;
+		size_t pntsCount = vecPoints.size();
+
+		LibMatrix<T> mtrx_Rotation = LibMatrix<T>::Rotation(vec_Direction, angle);
+		LibVector<T> nrml = dirCoef * vec_Direction.GetNormalize();
+
+		LibVector<T> CirclDir = vec_Direction.GetOrtogonalVec().GetNormalize();
+		LibPoint<T> pt_OnCircle = pt_Center + CirclDir * Radius;
+
+		vecPoints.push_back(pt_Center);
+		vecNormals.push_back(nrml);
 		for (int i = 0; i < pntsCountOnCrcl; i++)
 		{
 			pt_OnCircle = LibMatrix<T>::MultPt(pt_OnCircle, mtrx_Rotation);
-			m_vecPoints.push_back(pt_OnCircle);
-			m_vecNormals.push_back((dirCoef) * nrmlDirection);
+			vecPoints.push_back(pt_OnCircle);
+			vecNormals.push_back(nrml);
 		}
-		m_vecSurfaces.push_back(m_vecSurfaces.size(), m_vecSurfaces.size() + pntsCountOnCrcl);
-	}
 
-	void Clear() {
-		m_vecPoints.clear();
-		m_vecNormals.clear();
-		m_vecTriangles.clear();
-		m_vecSurfaces.clear();
+		for (size_t i = 1; i <= pntsCountOnCrcl; ++i)
+		{
+			vecTriangles.push_back(vecPoints[pntsCount]);
+			vecTriangles.push_back(vecPoints[pntsCount + i]);
+			vecTriangles.push_back(vecPoints[pntsCount + 1 + i % (pntsCountOnCrcl)]);
+		}
+		vecSurfaces.push_back(Surface(trnglsCount, vecTriangles.size() / 3));
 	}
 
 private:
 	std::vector<LibPoint<T>> m_vecPoints;
 	std::vector<LibVector<T>> m_vecNormals;
-	std::vector<int> m_vecTriangles;
+	std::vector<size_t> m_vecTriangles;
 	std::vector<Surface> m_vecSurfaces;
 };
