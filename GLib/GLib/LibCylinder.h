@@ -8,6 +8,10 @@
 #include "LibMatrix.h"
 #include <vector>
 
+//#define StartTimer(name) { \
+// Timer; static metod start() 
+//} \
+
 template<typename T>
 class LibCylinder {
 public:

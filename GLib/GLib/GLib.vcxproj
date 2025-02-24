@@ -162,6 +162,7 @@
     <ClInclude Include="MyTestMacros.h" />
     <ClInclude Include="Plane.h" />
     <ClInclude Include="LibTriangle.h" />
+    <ClInclude Include="LibTimer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

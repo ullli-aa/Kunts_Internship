@@ -77,5 +77,8 @@
     <ClInclude Include="LibModel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LibTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

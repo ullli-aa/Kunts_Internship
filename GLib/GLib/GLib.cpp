@@ -407,7 +407,22 @@ public:
 		MY_ASSERT_EQ(expTr, triangles);
 	}
 
-	void ModelTest_IntersRay() {
+	void ModelTest_CreateCylinder() {
+		Pt center(0, 0, 0); Vec direction(0, 0, 1);
+		Model cylinder = Model::CreateCylinder(center, direction, 1, 2, 0.5);
+
+		MY_ASSERT_EQ(cylinder.Points().size(), 20);
+		MY_ASSERT_EQ(cylinder.Normals().size(), 20);
+		MY_ASSERT_EQ(cylinder.Triangles().size(), 36);
+		MY_ASSERT_EQ(cylinder.Surfaces().size(), 3);
+
+		std::vector<size_t> exp = { 0, 1, 2, 0, 2, 3, 0, 3, 1,
+			4, 5, 6, 4, 6, 7, 4, 7, 5,
+			1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 1, 5, 3, 5, 7 };
+		MY_ASSERT_EQ(exp, cylinder.Triangles());
+	}
+
+	void ModelTest_CubeIntersRay() {
 		Pt center(0.5, 0.5, 0.5);
 		Model cube = Model::CreateCube(center, 1.0);
 
@@ -423,26 +438,64 @@ public:
 		MY_ASSERT_FALSE(cube.IsIntersectionRay(ray, pt, srfc));
 	}
 
+	void ModelTest_CylinderIntersRay() {
+		Pt center(0, 0, 0); Vec direction(0, 0, 1);
+		Model cylinder = Model::CreateCylinder(center, direction, 1, 2, 0.5);
+
+		Ray ray(Pt(1.5, -1.5, 2), Vec(1.5, 3.5, 2));
+		Pt pt; Srfc srfc;
+
+		MY_ASSERT_FALSE(cylinder.IsIntersectionRay(ray, pt, srfc));
+
+		ray.SetDirection(Vec(3, -3, 1));
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
+		MY_ASSERT_EQ(Srfc(6, cylinder.Triangles().size() / 3), srfc);
+		MY_ASSERT_EQ(Pt(0.5, -0.5, 1.666666666), pt);
+
+		ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
+		MY_ASSERT_EQ(Srfc(3, 6), srfc);
+		MY_ASSERT_EQ(Pt(0.264705882, -0.264705882, 2), pt);
+
+		ray = Ray(Pt(0, 0, 3), Vec(0, 0, -1));
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
+		MY_ASSERT_EQ(Srfc(3, 6), srfc);
+		MY_ASSERT_EQ(Pt(0, 0, 2), pt);
+
+		ray = Ray(Pt(0, 0, -3), Vec(0, 0, 1));
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
+		MY_ASSERT_EQ(Srfc(0, 3), srfc);
+		MY_ASSERT_EQ(Pt(0, 0, 0), pt);
+	}
+
 	void RunAllTests() {
 		RUN_TEST(PointTest_DistanceTo);
 		RUN_TEST(PointTest_Operators);
+
 		RUN_TEST(VecTest_Parallel);
 		RUN_TEST(VecTest_IsZero);
 		RUN_TEST(VecTest_EqOperators);
 		RUN_TEST(VecTest_ScalarMultOperator);
 		RUN_TEST(VecTest_ScalarDivOperator);
+
 		RUN_TEST(LineTest_Basic);
+
 		RUN_TEST(MatrixTest_Equal);
 		RUN_TEST(MatrixTest_Translation);
 		RUN_TEST(MatrixTest_Scaling);
 		RUN_TEST(MatrixTest_Rotation);
 		RUN_TEST(MatrixTest_OpCombination);
 		RUN_TEST(MatrixTest_Inverse);
+
 		RUN_TEST(CylTest_IntersLine);
+		
 		RUN_TEST(TriangleTest_IsPointOnTrngl);
 		RUN_TEST(TriangleTest_IntersLine);
+
 		RUN_TEST(ModelTest_CreateCube);
-		RUN_TEST(ModelTest_IntersRay);
+		RUN_TEST(ModelTest_CreateCylinder);
+		RUN_TEST(ModelTest_CubeIntersRay);
+		RUN_TEST(ModelTest_CylinderIntersRay);
 	}
 };
 

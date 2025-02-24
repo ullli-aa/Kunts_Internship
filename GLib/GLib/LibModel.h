@@ -82,7 +82,6 @@ public:
 		LibPoint<T> K(x - halfLen, y + halfLen, z - halfLen);
 
 		std::vector<LibPoint<T>> vecPoints = std::vector<LibPoint<T>>{A, D, C, B, D, K, F, C, K, G, E, F, G, A, B, E, B, C, F, E, G, K, D, A};
-		std::cerr << vecPoints.size();
 		LibVector<T> AB = B - A;
 		LibVector<T> DA = A - D;
 		LibVector<T> KD = D - K;
@@ -119,14 +118,14 @@ public:
 		return model;
 	}
 
-	static LibModel<T>& GreateCylinder(const LibPoint<T>& pt_Origin,
+	static LibModel<T> CreateCylinder(const LibPoint<T>& pt_Origin,
 		const LibVector<T>& vec_Direction, T Radius, T Height, T ChordTolerance) {
 		std::vector<LibPoint<T>> vecPoints;
 		std::vector<LibVector<T>> vecNormals;
 		std::vector<size_t> vecTriangles;
 		std::vector<Surface> vecSurfaces;
 
-		T angle = std::cos((Radius - ChordTolerance) / Radius) * 2;
+		T angle = std::acos((Radius - ChordTolerance) / Radius) * 2;
 
 		GetCirclePoints(vecPoints, vecNormals, vecTriangles, vecSurfaces,
 			pt_Origin, vec_Direction, Radius, angle, -1);
@@ -137,10 +136,10 @@ public:
 			pt_UpOrigin, vec_Direction, Radius, angle, 1);
 
 		LibCylinder<T> cylndr(pt_Origin, vec_Direction, Radius);
-		int pntsCountOnCrcl = (vecPoints.size() - 2) / 2;
-		int trnglCount = vecPoints.size() / 2;
+		size_t pntsCountOnCrcl = (vecPoints.size()) / 2 - 1;
+		size_t trnglCount = vecTriangles.size() / 3;
 
-		for (size_t i = 1; i < vecPoints.size() / 2; i++)
+		for (size_t i = 1; i < pntsCountOnCrcl + 1; i++)
 		{
 			LibPoint<T> A = vecPoints[i];
 			LibPoint<T> B = vecPoints[i % pntsCountOnCrcl + 1];
@@ -160,21 +159,22 @@ public:
 			vecNormals.push_back(normal2);
 			vecNormals.push_back(normal1);
 
-			vecTriangles.push_back(A);
-			vecTriangles.push_back(B);
-			vecTriangles.push_back(C);
+			vecTriangles.push_back(i);
+			vecTriangles.push_back(i % pntsCountOnCrcl + 1);
+			vecTriangles.push_back(i % pntsCountOnCrcl + pntsCountOnCrcl + 2);
 
-			vecTriangles.push_back(A);
-			vecTriangles.push_back(C);
-			vecTriangles.push_back(D);
+			vecTriangles.push_back(i);
+			vecTriangles.push_back(i % pntsCountOnCrcl + pntsCountOnCrcl + 2);
+			vecTriangles.push_back(i + pntsCountOnCrcl + 1);
 		}
-		vecSurfaces.push_back(Surface(trnglCount, vecTriangles.size()));
+		vecSurfaces.push_back(Surface(trnglCount, vecTriangles.size() / 3));
 
 		LibModel<T> model(vecPoints, vecNormals, vecTriangles, vecSurfaces);
 		return model;
 	}
 
 	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
+		// текущее время1 start
 		T dist = DBL_MAX;
 		size_t ind = 0;
 		LibPoint<T> intersPt;
@@ -196,10 +196,12 @@ public:
 			return false;
 		}
 		srfc = FindSurfForTrngl(ind);
+		// текущее время2 stop
+		// inside stop (время2 - время1 (принт) (добавить в сумм время))
 		return true;
 	}
 
-	const LibPoint<T>& FindTrnglPt(size_t ind, size_t pos) {
+	const LibPoint<T>& FindTrnglPt(size_t ind, size_t pos) const {
 		return m_vecPoints[m_vecTriangles[ind * 3 + pos]];
 	}
 	
@@ -212,12 +214,16 @@ protected:
 		}
 	}
 
-	void GetCirclePoints(std::vector<LibPoint<T>>& vecPoints, std::vector<LibVector<T>>& vecNormals,
+	static void GetCirclePoints(std::vector<LibPoint<T>>& vecPoints, std::vector<LibVector<T>>& vecNormals,
 		std::vector<size_t>& vecTriangles, std::vector<Surface>& vecSurfaces,
 		const LibPoint<T>& pt_Center, const LibVector<T>& vec_Direction,
-		T Radius, T angle, T dirCoef) 
+		T Radius, T angle, T dirCoef)
 	{
-		int pntsCountOnCrcl = 2 * M_PI / angle;
+		int pntsCountOnCrcl = (2 * M_PI) / angle;
+		if ((2 * M_PI) / angle - pntsCountOnCrcl > 0.5) {
+			pntsCountOnCrcl++;
+		}
+
 		size_t trnglsCount = vecTriangles.size() / 3;
 		size_t pntsCount = vecPoints.size();
 
@@ -238,9 +244,9 @@ protected:
 
 		for (size_t i = 1; i <= pntsCountOnCrcl; ++i)
 		{
-			vecTriangles.push_back(vecPoints[pntsCount]);
-			vecTriangles.push_back(vecPoints[pntsCount + i]);
-			vecTriangles.push_back(vecPoints[pntsCount + 1 + i % (pntsCountOnCrcl)]);
+			vecTriangles.push_back(pntsCount);
+			vecTriangles.push_back(pntsCount + i);
+			vecTriangles.push_back(pntsCount + 1 + i % (pntsCountOnCrcl));
 		}
 		vecSurfaces.push_back(Surface(trnglsCount, vecTriangles.size() / 3));
 	}
