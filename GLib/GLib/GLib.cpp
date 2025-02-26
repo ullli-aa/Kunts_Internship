@@ -447,10 +447,18 @@ public:
 
 		MY_ASSERT_FALSE(cylinder.IsIntersectionRay(ray, pt, srfc));
 
-		ray.SetDirection(Vec(3, -3, 1));
+		ray.SetDirection(Vec(-3, 3, -1));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
 		MY_ASSERT_EQ(Srfc(6, cylinder.Triangles().size() / 3), srfc);
 		MY_ASSERT_EQ(Pt(0.5, -0.5, 1.666666666), pt);
+
+		ray = Ray(Pt(1, -1, 1.83), Vec(0.5, -0.5, 0.17));
+		MY_ASSERT_FALSE(cylinder.IsIntersectionRay(ray, pt, srfc));
+
+		ray = Ray(Pt(0, 0, 1), Vec(1.5, -1.5, 1));
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
+		MY_ASSERT_EQ(Srfc(6, cylinder.Triangles().size() / 3), srfc);
+		MY_ASSERT_EQ(Pt(0.5, -0.5, 1.333333333), pt);
 
 		ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
@@ -479,15 +487,19 @@ public:
 		TIMER_END("Create Cylinder without thread");
 
 		Ray ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
-		Pt pt; Srfc srfc;
 
+		Pt pt; Srfc srfc;
 		TIMER_START("Big Cylinder without thread");
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
 		TIMER_END("Big Cylinder without thread");
 
+		Pt pt2; Srfc srfc2;
 		TIMER_START("Big Cylinder with thread");
-		MY_ASSERT_TRUE(cylinder.IsIntersectionRayThread(ray, pt, srfc));
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRayThread(ray, pt2, srfc2));
 		TIMER_END("Big Cylinder with thread");
+
+		MY_ASSERT_EQ(pt, pt2);
+		MY_ASSERT_EQ(srfc, srfc2);
 	}
 
 	void RunAllTests() {

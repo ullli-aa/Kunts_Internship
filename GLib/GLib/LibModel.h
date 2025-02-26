@@ -180,17 +180,21 @@ public:
 
 		T dist = DBL_MAX;
 		size_t ind = 0;
-		LibPoint<T> intersPt;
 		for (size_t i = 0; i < m_vecTriangles.size(); i += 3) {
 			LibTriangle<T> trngl(m_vecPoints[m_vecTriangles[i]],
 				m_vecPoints[m_vecTriangles[i + 1]],
 				m_vecPoints[m_vecTriangles[i + 2]]);
-			if (trngl.IsIntersectionLine(ray, intersPt)) {
-				T curDist = intersPt.DistanceTo(ray.Origin());
+
+			LibPoint<T> IntersPt;
+			if (trngl.IsIntersectionLine(ray, IntersPt)) {
+				if (!ray.IsPointOnLine(IntersPt)) {
+					continue;
+				}
+
+				T curDist = IntersPt.DistanceTo(ray.Origin());
 				if (curDist < dist) {
 					dist = curDist;
 					ind = i / 3;
-					pt = intersPt;
 				}
 			}
 		}
@@ -199,6 +203,8 @@ public:
 			TIMER_END("intersection of model and ray");
 			return false;
 		}
+
+		pt = ray.Origin() + dist * ray.Direction().GetNormalize();
 		srfc = FindSurfForTrngl(ind);
 		
 		TIMER_END("intersection of model and ray");
@@ -209,10 +215,7 @@ public:
 	bool IsIntersectionRayThread(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
 		TIMER_START("intersection with thread of model and ray");
 
-		std::atomic<T> minDist(DBL_MAX);
-		std::atomic<size_t> minInd(0);
-
-		auto processTriangles = [&](size_t trnglIndex, size_t count) {
+		auto processTriangles = [&](size_t trnglIndex, size_t count, T& minDist, size_t& minInd) {
 			size_t startIndex = trnglIndex * 3;
 			size_t endIndex = startIndex + count * 3;
 			for (size_t i = startIndex; i < endIndex; i += 3) {
@@ -222,11 +225,15 @@ public:
 
 				LibPoint<T> localIntersPt;
 				if (trngl.IsIntersectionLine(ray, localIntersPt)) {
+					if (!ray.IsPointOnLine(localIntersPt)) {
+						continue;
+					}
+
 					T curDist = localIntersPt.DistanceTo(ray.Origin());
+
 					if (curDist < minDist) {
 						minDist = curDist;
 						minInd = i / 3;
-						pt = localIntersPt;
 					}
 				}
 			}
@@ -235,6 +242,8 @@ public:
 		const size_t numThreads = std::thread::hardware_concurrency(); // количество потоков
 
 		std::vector<std::thread> threads;
+		std::vector<T> minDists(numThreads, DBL_MAX);
+		std::vector<size_t> minInd(numThreads, 0);
 
 		const size_t trnglsCount = Triangles().size() / 3;
 		std::vector<size_t> trnglsForThread(numThreads, trnglsCount / numThreads);
@@ -247,7 +256,7 @@ public:
 		size_t startInd = 0;
 		for (size_t t = 0; t < numThreads; ++t) {
 			size_t count = trnglsForThread[t];
-			threads.emplace_back(processTriangles, startInd, count);
+			threads.emplace_back(processTriangles, startInd, count, std::ref(minDists[t]), std::ref(minInd[t]));
 			startInd += count;
 		}
 
@@ -255,12 +264,23 @@ public:
 			thread.join();
 		}
 
+		T minDist = minDists[0];
+		size_t ind = 0;
+		for (size_t i = 1; i < numThreads; i++)
+		{
+			if (minDists[i] < minDist) {
+				minDist = minDists[i];
+				ind = minInd[i];
+			}
+		}
+
 		if (minDist == DBL_MAX) {
 			TIMER_END("intersection with thread of model and ray");
 			return false;
 		}
 
-		srfc = FindSurfForTrngl(minInd);
+		pt = ray.Origin() + minDist * ray.Direction().GetNormalize();
+		srfc = FindSurfForTrngl(ind);
 		TIMER_END("intersection with thread of model and ray");
 
 		return true;
