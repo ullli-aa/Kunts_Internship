@@ -469,17 +469,25 @@ public:
 
 		ray = Ray(Pt(1.5, -1.5, 0), Vec(0, 0, -1));
 		MY_ASSERT_FALSE(cylinder.IsIntersectionRay(ray, pt, srfc));
+	}
 
-		TIMER_START("Create Cylinder");
-		cylinder = Model::CreateCylinder(center, direction, 1, 2, 1e-12);
-		TIMER_END("Create Cylinder");
+	void ModelTest_BigCylinder() {
+		Pt center(0, 0, 0); Vec direction(0, 0, 1);
 
-		ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
-		std::cout << cylinder.Triangles().size() / 3;
-		TIMER_START("Big Cylinder");
+		TIMER_START("Create Cylinder without thread");
+		Model cylinder = Model::CreateCylinder(center, direction, 1, 2, 1e-12);
+		TIMER_END("Create Cylinder without thread");
+
+		Ray ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
+		Pt pt; Srfc srfc;
+
+		TIMER_START("Big Cylinder without thread");
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
-		TIMER_END("Big Cylinder");
+		TIMER_END("Big Cylinder without thread");
 
+		TIMER_START("Big Cylinder with thread");
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRayThread(ray, pt, srfc));
+		TIMER_END("Big Cylinder with thread");
 	}
 
 	void RunAllTests() {
@@ -510,6 +518,7 @@ public:
 		RUN_TEST(ModelTest_CreateCylinder);
 		RUN_TEST(ModelTest_CubeIntersRay);
 		RUN_TEST(ModelTest_CylinderIntersRay);
+		RUN_TEST(ModelTest_BigCylinder);
 	}
 };
 

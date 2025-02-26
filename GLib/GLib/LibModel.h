@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <thread>
 #include "LibPoint.h"
 #include "LibVector.h"
 #include "LibTriangle.h"
@@ -201,6 +202,66 @@ public:
 		srfc = FindSurfForTrngl(ind);
 		
 		TIMER_END("intersection of model and ray");
+
+		return true;
+	}
+
+	bool IsIntersectionRayThread(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
+		TIMER_START("intersection with thread of model and ray");
+
+		std::atomic<T> minDist(DBL_MAX);
+		std::atomic<size_t> minInd(0);
+
+		auto processTriangles = [&](size_t trnglIndex, size_t count) {
+			size_t startIndex = trnglIndex * 3;
+			size_t endIndex = startIndex + count * 3;
+			for (size_t i = startIndex; i < endIndex; i += 3) {
+				LibTriangle<T> trngl(m_vecPoints[m_vecTriangles[i]],
+					m_vecPoints[m_vecTriangles[i + 1]],
+					m_vecPoints[m_vecTriangles[i + 2]]);
+
+				LibPoint<T> localIntersPt;
+				if (trngl.IsIntersectionLine(ray, localIntersPt)) {
+					T curDist = localIntersPt.DistanceTo(ray.Origin());
+					if (curDist < minDist) {
+						minDist = curDist;
+						minInd = i / 3;
+						pt = localIntersPt;
+					}
+				}
+			}
+		};
+
+		const size_t numThreads = std::thread::hardware_concurrency(); // количество потоков
+
+		std::vector<std::thread> threads;
+
+		const size_t trnglsCount = Triangles().size() / 3;
+		std::vector<size_t> trnglsForThread(numThreads, trnglsCount / numThreads);
+		const size_t trnglsRemainder = trnglsCount % numThreads;
+
+		for (size_t i = 0; i < trnglsRemainder; ++i) {
+			trnglsForThread[i]++;
+		}
+
+		size_t startInd = 0;
+		for (size_t t = 0; t < numThreads; ++t) {
+			size_t count = trnglsForThread[t];
+			threads.emplace_back(processTriangles, startInd, count);
+			startInd += count;
+		}
+
+		for (auto& thread : threads) {
+			thread.join();
+		}
+
+		if (minDist == DBL_MAX) {
+			TIMER_END("intersection with thread of model and ray");
+			return false;
+		}
+
+		srfc = FindSurfForTrngl(minInd);
+		TIMER_END("intersection with thread of model and ray");
 
 		return true;
 	}
