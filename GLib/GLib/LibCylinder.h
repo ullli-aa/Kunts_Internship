@@ -6,11 +6,8 @@
 #include "LibEps.h"
 #include "LibUtility.h"
 #include "LibMatrix.h"
+#include "LibTimer.h"
 #include <vector>
-
-//#define StartTimer(name) { \
-// Timer; static metod start() 
-//} \
 
 template<typename T>
 class LibCylinder {
@@ -48,6 +45,8 @@ public:
 	}
 
 	std::vector<LibPoint<T>> IsIntersectionLine(const LibLine<T>& line) const {
+		TIMER_START("intersection of cylinder and line");
+
 		std::vector<LibPoint<T>> result;
 		if (line.Direction().IsParallel(Direction())) {
 			return result;
@@ -82,6 +81,7 @@ public:
 		T D = b * b - 4 * a * c;
 
 		if (D < 0) {
+			TIMER_END("intersection of cylinder and line");
 			return result; // no inters
 		}
 
@@ -93,6 +93,7 @@ public:
 		if (D == 0) {
 			T t1 = -b / (2 * a);
 			result.push_back(GetResForInters(t1, locLine, globCoord));
+			TIMER_END("intersection of cylinder and line");
 			return result;
 		}
 
@@ -100,6 +101,8 @@ public:
 		result.push_back(GetResForInters(t1, locLine, globCoord));
 		T t2 = (-b - std::sqrt(D)) / (2 * a);
 		result.push_back(GetResForInters(t2, locLine, globCoord));
+
+		TIMER_END("intersection of cylinder and line");
 
 		return result;
 	}

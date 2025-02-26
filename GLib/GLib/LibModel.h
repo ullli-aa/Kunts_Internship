@@ -5,6 +5,7 @@
 #include "LibVector.h"
 #include "LibTriangle.h"
 #include "LibRay.h"
+#include "LibTimer.h"
 
 template<typename T>
 class LibModel
@@ -174,7 +175,8 @@ public:
 	}
 
 	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
-		// текущее время1 start
+		TIMER_START("intersection of model and ray");
+
 		T dist = DBL_MAX;
 		size_t ind = 0;
 		LibPoint<T> intersPt;
@@ -193,11 +195,13 @@ public:
 		}
 
 		if (dist == DBL_MAX) {
+			TIMER_END("intersection of model and ray");
 			return false;
 		}
 		srfc = FindSurfForTrngl(ind);
-		// текущее время2 stop
-		// inside stop (время2 - время1 (принт) (добавить в сумм время))
+		
+		TIMER_END("intersection of model and ray");
+
 		return true;
 	}
 
@@ -219,7 +223,7 @@ protected:
 		const LibPoint<T>& pt_Center, const LibVector<T>& vec_Direction,
 		T Radius, T angle, T dirCoef)
 	{
-		int pntsCountOnCrcl = (2 * M_PI) / angle;
+		int pntsCountOnCrcl = static_cast<int>((2 * M_PI) / angle);
 		if ((2 * M_PI) / angle - pntsCountOnCrcl > 0.5) {
 			pntsCountOnCrcl++;
 		}

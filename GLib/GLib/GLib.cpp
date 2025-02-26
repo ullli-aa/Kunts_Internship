@@ -466,6 +466,20 @@ public:
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
 		MY_ASSERT_EQ(Srfc(0, 3), srfc);
 		MY_ASSERT_EQ(Pt(0, 0, 0), pt);
+
+		ray = Ray(Pt(1.5, -1.5, 0), Vec(0, 0, -1));
+		MY_ASSERT_FALSE(cylinder.IsIntersectionRay(ray, pt, srfc));
+
+		TIMER_START("Create Cylinder");
+		cylinder = Model::CreateCylinder(center, direction, 1, 2, 1e-12);
+		TIMER_END("Create Cylinder");
+
+		ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
+		std::cout << cylinder.Triangles().size() / 3;
+		TIMER_START("Big Cylinder");
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
+		TIMER_END("Big Cylinder");
+
 	}
 
 	void RunAllTests() {
@@ -503,4 +517,5 @@ int main()
 {
 	Tests test;
 	test.RunAllTests();
+	TIMER_PRINT();
 }
