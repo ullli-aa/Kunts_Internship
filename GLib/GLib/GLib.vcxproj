@@ -157,6 +157,7 @@
     <ClInclude Include="LibLine.h" />
     <ClInclude Include="LibPoint.h" />
     <ClInclude Include="LibRay.h" />
+    <ClInclude Include="LibThreadPool.h" />
     <ClInclude Include="LibUtility.h" />
     <ClInclude Include="LibVector.h" />
     <ClInclude Include="LibMatrix.h" />

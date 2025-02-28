@@ -9,6 +9,7 @@
 #include "LibLine.h"
 #include "LibModel.h"
 #include "LibRay.h"
+#include "LibThreadPool.h"
 
 typedef LibPoint<double> Pt;
 typedef LibTriangle<double> Trngl;
@@ -18,6 +19,7 @@ typedef LibMatrix<double> Mtrx;
 typedef LibModel<double> Model;
 typedef LibModel<double>::Surface Srfc;
 typedef LibRay<double> Ray;
+typedef LibThreadPool TP;
 
 class Tests {
 public:
@@ -500,6 +502,11 @@ public:
 
 		MY_ASSERT_EQ(pt, pt2);
 		MY_ASSERT_EQ(srfc, srfc2);
+
+		TP tp(8);
+		Pt pt3; Srfc srfc3;
+		MY_ASSERT_TRUE(cylinder.IsIntersectionRayTP(ray, pt3, srfc3, tp));
+
 	}
 
 	void RunAllTests() {
