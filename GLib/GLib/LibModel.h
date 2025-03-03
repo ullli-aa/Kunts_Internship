@@ -292,33 +292,24 @@ public:
 		TIMER_START("intersection with ThreadPool of model and ray");
 		const size_t trnglsCount = Triangles().size() / 3;
 
-		size_t trnglsPerThread = 1000;
-		size_t trnglsRemainder = trnglsCount % 1000;
+		size_t trnglsPerThread = static_cast<size_t>(trnglsCount * 0.01);
+		size_t trnglsRemainder = trnglsCount % trnglsPerThread;
 
 		size_t taskCnt = trnglsCount / trnglsPerThread;
-		std::vector<T> minDists(taskCnt, DBL_MAX);
-		std::vector<size_t> minInd(taskCnt, 0);
-		// через мьютексы
+		T minDist = DBL_MAX;
+		size_t minInd = 0;
+
+		std::mutex mtx;
 
 		size_t startInd = 0;
 		for (size_t i = 0; i < taskCnt; ++i) {
 			size_t count = trnglsPerThread + (i < trnglsRemainder ? 1 : 0);
-			tp.AddTask(std::make_unique<IntersectionTask>(ray, m_vecPoints, m_vecTriangles,
-				startInd, count, minDists[i], minInd[i]));
+			tp.AddTask(std::make_unique<IntersectionTask>(*this, ray, startInd, count, minDist, minInd, mtx));
 			
 			startInd += count;
 		}
 
 		tp.WaitForFinish();
-
-		T minDist = minDists[0];
-		size_t ind = 0;
-		for (size_t i = 1; i < taskCnt; i++) {
-			if (minDists[i] < minDist) {
-				minDist = minDists[i];
-				ind = minInd[i];
-			}
-		}
 
 		if (minDist == std::numeric_limits<T>::max()) {
 			TIMER_END("intersection with ThreadPool of model and ray");
@@ -326,7 +317,7 @@ public:
 		}
 
 		pt = ray.Origin() + minDist * ray.Direction().GetNormalize();
-		srfc = FindSurfForTrngl(ind);
+		srfc = FindSurfForTrngl(minInd);
 		TIMER_END("intersection with ThreadPool of model and ray");
 
 		return true;
@@ -384,26 +375,25 @@ protected:
 
 private:
 	class IntersectionTask : public Task {
+		const LibModel<T>& model;
 		const LibRay<T>& ray;
-		const std::vector<LibPoint<T>>& points;
-		const std::vector<size_t>& triangles;
 		size_t startIndex;
 		size_t count;
 		T& minDist;
 		size_t& minInd;
+		std::mutex& mtx;
 
 	public:
-		IntersectionTask(const LibRay<T>& r, const std::vector<LibPoint<T>>& pts,
-			const std::vector<size_t>& trngls, size_t start, size_t cnt,
-			T& minD, size_t& minI)
-			: ray(r), points(pts), triangles(trngls), startIndex(start), count(cnt),
-			minDist(minD), minInd(minI) {}
+		IntersectionTask(const LibModel<T>& mdl, const LibRay<T>& r, size_t start, size_t cnt,
+			T& minD, size_t& minI, std::mutex& mutex)
+			: model(mdl), ray(r), startIndex(start), count(cnt),
+			minDist(minD), minInd(minI), mtx(mutex) { }
 
 		void Do() override {
 			for (size_t i = startIndex * 3; i < (startIndex + count) * 3; i += 3) {
-				LibTriangle<T> trngl(points[triangles[i]],
-					points[triangles[i + 1]],
-					points[triangles[i + 2]]);
+				LibTriangle<T> trngl(model.Points()[model.Triangles()[i]],
+					model.Points()[model.Triangles()[i + 1]],
+					model.Points()[model.Triangles()[i + 2]]);
 
 				LibPoint<T> localIntersPt;
 				if (trngl.IsIntersectionLine(ray, localIntersPt)) {
@@ -412,10 +402,13 @@ private:
 					}
 
 					T curDist = localIntersPt.DistanceTo(ray.Origin());
+
+					mtx.lock();
 					if (curDist < minDist) {
 						minDist = curDist;
 						minInd = i / 3;
 					}
+					mtx.unlock();
 				}
 			}
 		}

@@ -503,9 +503,14 @@ public:
 		MY_ASSERT_EQ(pt, pt2);
 		MY_ASSERT_EQ(srfc, srfc2);
 
-		TP tp(8);
+		TP tp(std::thread::hardware_concurrency());
 		Pt pt3; Srfc srfc3;
+		TIMER_START("Big Cylinder with threadPool");
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRayTP(ray, pt3, srfc3, tp));
+		TIMER_END("Big Cylinder with threadPool");
+
+		MY_ASSERT_EQ(pt, pt3);
+		MY_ASSERT_EQ(srfc, srfc3);
 
 	}
 
@@ -547,3 +552,6 @@ int main()
 	test.RunAllTests();
 	TIMER_PRINT();
 }
+
+// vec, point, model (save, load)
+// qt диалог, open file. OpenGl
