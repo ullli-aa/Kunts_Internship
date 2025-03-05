@@ -37,6 +37,16 @@ public:
 				(m_end == other.m_end);
 		}
 
+		void Save(std::ostream& out) const {
+			LibUtility<size_t>::Save(out, m_begin, sizeof(size_t));
+			LibUtility<size_t>::Save(out, m_end, sizeof(size_t));
+		}
+
+		void Load(std::istream& in) {
+			LibUtility<size_t>::Load(in, m_begin, sizeof(size_t));
+			LibUtility<size_t>::Load(in, m_end, sizeof(size_t));
+		}
+
 	private:
 		size_t m_begin;
 		size_t m_end;
@@ -68,6 +78,11 @@ public:
 	inline const std::vector<Surface>& Surfaces() const
 	{
 		return m_vecSurfaces;
+	}
+
+	bool operator==(const LibModel<T>& other) const {
+		return Points() == other.Points() && Normals() == other.Normals() &&
+			Triangles() == other.Triangles() && Surfaces() == other.Surfaces();
 	}
 
 	static LibModel<T> CreateCube(const LibPoint<T>& center, T length)
@@ -325,6 +340,70 @@ public:
 
 	const LibPoint<T>& FindTrnglPt(size_t ind, size_t pos) const {
 		return m_vecPoints[m_vecTriangles[ind * 3 + pos]];
+	}
+
+	void Save(std::ostream& out) const {
+		size_t pointsSize = m_vecPoints.size();
+		LibUtility<size_t>::Save(out, pointsSize, sizeof(size_t));
+		for (const auto& point : m_vecPoints) {
+			point.Save(out);
+		}
+
+		size_t normalsSize = m_vecNormals.size();
+		LibUtility<size_t>::Save(out, normalsSize, sizeof(size_t));
+		for (const auto& normal : m_vecNormals) {
+			normal.Save(out);
+		}
+
+		size_t trianglesSize = m_vecTriangles.size();
+		LibUtility<size_t>::Save(out, trianglesSize, sizeof(size_t));
+		if (trianglesSize > 0) {
+			LibUtility<size_t>::Save(out, m_vecTriangles[0], trianglesSize * sizeof(size_t));
+		}
+
+		size_t surfacesSize = m_vecSurfaces.size();
+		LibUtility<size_t>::Save(out, surfacesSize, sizeof(size_t));
+		for (const auto& surface : m_vecSurfaces) {
+			surface.Save(out);
+		}
+	}
+
+	void Load(std::istream& in) {
+		size_t pointsSize = 0;
+		LibUtility<size_t>::Load(in, pointsSize, sizeof(size_t));
+		for (size_t i = 0; i < pointsSize; i++)
+		{
+			LibPoint<T> pt;
+			pt.Load(in);
+			m_vecPoints.push_back(pt);
+		}
+
+		size_t normalsSize = 0;
+		LibUtility<size_t>::Load(in, normalsSize, sizeof(size_t));
+		for (size_t i = 0; i < normalsSize; i++)
+		{
+			LibVector<T> nrml;
+			nrml.Load(in);
+			m_vecNormals.push_back(nrml);
+		}
+
+		size_t trianglesSize = 0;
+		LibUtility<size_t>::Load(in, trianglesSize, sizeof(size_t));
+		for (size_t i = 0; i < trianglesSize; i++)
+		{
+			size_t ind = 0;
+			LibUtility<size_t>::Load(in, ind, sizeof(size_t));
+			m_vecTriangles.push_back(ind);
+		}
+
+		size_t surfacesSize = 0;
+		LibUtility<size_t>::Load(in, surfacesSize, sizeof(size_t));
+		for (size_t i = 0; i < surfacesSize; i++)
+		{
+			Surface srfc{};
+			srfc.Load(in);
+			m_vecSurfaces.push_back(srfc);
+		}
 	}
 	
 protected:

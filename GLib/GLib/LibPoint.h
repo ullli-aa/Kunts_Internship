@@ -2,27 +2,28 @@
 
 #include "LibUtility.h"
 #include "LibVector.h"
+#include "LibCoordinates.h"
 #include "LibEps.h"
 #include <cmath>
 
 template<typename T>
-class LibPoint {
+class LibPoint : public LibCoordinates<T> {
 public:
-	LibPoint() : m_x(0.0), m_y(0.0), m_z(0.0) {};
-	LibPoint(T x, T y) : m_x(x), m_y(y), m_z(0.0) {};
-	LibPoint(T x, T y, T z) : m_x(x), m_y(y), m_z(z) {};;
+	LibPoint() : LibCoordinates<T>() {};
+	LibPoint(T x, T y) : LibCoordinates<T>(x, y) {};
+	LibPoint(T x, T y, T z) : LibCoordinates<T>(x, y, z) {};
 
 	~LibPoint() = default;
 
 	LibVector<T>& AsVector() const {
-		return LibVector<T>(m_x, m_y, m_z);
+		return LibVector<T>(this->m_x, this->m_y, this->m_z);
 	}
 
 	T SquareDistanceTo(const LibPoint<T>& other) const
 	{
-		return LibUtility<T>::Square(m_x - other.m_x) +
-			LibUtility<T>::Square(m_y - other.m_y) +
-			LibUtility<T>::Square(m_z - other.m_z);
+		return LibUtility<T>::Square(this->m_x - other.X()) +
+			LibUtility<T>::Square(this->m_y - other.Y()) +
+			LibUtility<T>::Square(this->m_z - other.Z());
 	};
 
 	T DistanceTo(const LibPoint<T>& other) const
@@ -45,50 +46,6 @@ public:
 		return SquareDistanceTo(other) <= LibUtility<double>::Square(eps);
 	};
 
-	inline T X() const
-	{
-		return m_x;
-	};
-
-	inline T Y() const
-	{
-		return m_y;
-	};
-
-	inline T Z() const
-	{
-		return m_z;
-	};
-
-	inline LibPoint<T>& SetX(T x)
-	{
-		m_x = x;
-		return *this;
-	};
-
-	inline LibPoint<T>& SetY(T y)
-	{
-		m_y = y;
-		return *this;
-	};
-
-	inline LibPoint<T>& SetZ(T z)
-	{
-		m_z = z;
-		return *this;
-	};
-
-	inline void SetXYZ(T x = 0.0, T y = 0.0, T z = 0.0)
-	{
-		m_x = x;
-		m_y = y;
-		m_z = z;
-	};
-
-private:
-	T m_x;
-	T m_y;
-	T m_z;
 };
 
 template<typename T>

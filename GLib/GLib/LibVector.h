@@ -1,47 +1,20 @@
 #pragma once
 
 #include "LibEps.h"
+#include "LibCoordinates.h"
 #include <cmath>
 #include <numbers>
 
 double M_PI = std::numbers::pi;
 
 template<typename T>
-class LibVector
+class LibVector : public LibCoordinates<T>
 {
 public:
-	LibVector() = default;
-	LibVector(T x, T y) : m_x(x), m_y(y) {};
-	LibVector(T x, T y, T z) : m_x(x), m_y(y), m_z(z) {};
+	LibVector() :LibCoordinates<T>() {};
+	LibVector(T x, T y) : LibCoordinates<T>(x, y) {};
+	LibVector(T x, T y, T z) : LibCoordinates<T>(x, y, z) {};
 	~LibVector() = default;
-
-	inline T X() const
-	{
-		return m_x;
-	}
-	inline T Y() const
-	{
-		return m_y;
-	}
-	inline T Z() const
-	{
-		return m_z;
-	}
-	inline LibVector<T>& SetX(T x)
-	{
-		m_x = x;
-		return *this;
-	}
-	inline LibVector<T>& SetY(T y)
-	{
-		m_y = y;
-		return *this;
-	}
-	inline LibVector<T>& SetZ(T z)
-	{
-		m_z = z;
-		return *this;
-	}
 
 	bool IsParallel(const LibVector<T>& other, double eps = LibEps::eps) const
 	{
@@ -53,22 +26,22 @@ public:
 
 	LibVector<T> operator*(T scalar) const
 	{
-		return LibVector<T>(X() * scalar, Y() * scalar, Z() * scalar);
+		return LibVector<T>(this->X() * scalar, this->Y() * scalar, this->Z() * scalar);
 	}
 
 	LibVector<T> operator/(T scalar) const
 	{
-		return LibVector(X() / scalar, Y() / scalar, Z() / scalar);
+		return LibVector(this->X() / scalar, this->Y() / scalar, this->Z() / scalar);
 	};
 
 	LibVector<T> operator+(const LibVector<T>& other) const
 	{
-		return LibVector<T>(m_x + other.X(), m_y + other.Y(), m_z + other.Z());
+		return LibVector<T>(this->m_x + other.X(), this->m_y + other.Y(), this->m_z + other.Z());
 	};
 
 	LibVector<T> operator-(const LibVector<T>& other) const
 	{
-		return LibVector<T>(m_x - other.X(), m_y - other.Y(), m_z - other.Z());
+		return LibVector<T>(this->m_x - other.X(), this->m_y - other.Y(), this->m_z - other.Z());
 	};
 
 	bool operator==(const LibVector<T>& other) const
@@ -88,7 +61,9 @@ public:
 
 	bool IsZero(double eps = LibEps::eps) const
 	{
-		return LibEps::IsZero(X(), eps) && LibEps::IsZero(Y(), eps) && LibEps::IsZero(Z(), eps);
+		return LibEps::IsZero(this->X(), eps) &&
+			LibEps::IsZero(this->Y(), eps) &&
+			LibEps::IsZero(this->Z(), eps);
 	};
 
 	double LengthVector() const
@@ -98,9 +73,9 @@ public:
 
 	double LengthVectorPow2() const
 	{
-		return X() * X() +
-			Y() * Y() +
-			Z() * Z();
+		return this->X() * this->X() +
+			this->Y() * this->Y() +
+			this->Z() * this->Z();
 	};
 
 	LibVector<T> ProjectionOnto(const LibVector<T>& other) const {
@@ -120,22 +95,22 @@ public:
 		double length = LengthVector();
 		if (!IsZero())
 		{
-			return LibVector<T>(X() / length, Y() / length, Z() / length);
+			return LibVector<T>(this->X() / length, this->Y() / length, this->Z() / length);
 		}
 		return *this;
 	};
 
 	double DotProduct(const LibVector<T>& other) const
 	{
-		return X() * other.X() + Y() * other.Y() + Z() * other.Z();
+		return this->X() * other.X() + this->Y() * other.Y() + this->Z() * other.Z();
 	};
 
 	LibVector<T> CrossProduct(const LibVector<T>& other) const
 	{
 		return LibVector(
-			Y() * other.Z() - Z() * other.Y(),
-			-X() * other.Z() + Z() * other.X(),
-			X() * other.Y() - Y() * other.X());
+			this->Y() * other.Z() - this->Z() * other.Y(),
+			-this->X() * other.Z() + this->Z() * other.X(),
+			this->X() * other.Y() - this->Y() * other.X());
 	};
 
 	double TripleProduct(const LibVector<T>& first, const LibVector<T>& second) const
@@ -167,33 +142,20 @@ public:
 	};
 
 	LibVector<T> GetOrtogonalVec(const double eps = LibEps::eps) const {
-		if (LibEps::IsZero(X())) {
-			if (!LibEps::IsZero(Y())) {
-				return LibVector<T>(0, Z(), -Y());
+		if (LibEps::IsZero(this->X())) {
+			if (!LibEps::IsZero(this->Y())) {
+				return LibVector<T>(0, this->Z(), -this->Y());
 			}
-			return LibVector<T>(0, Z(), 0);
+			return LibVector<T>(0, this->Z(), 0);
 
 		}
-		return LibVector<T>(Y(), -X(), 0);
+		return LibVector<T>(this->Y(), -this->X(), 0);
 	}
 
 	bool IsOpposite(const LibVector<T>& other, double eps = LibEps::eps) const
 	{
 		return DotProduct(other) < 0 && IsParallel(other, eps);
 	};
-
-	LibVector<T> Rotate2D(double angle) const
-	{
-		double radians = angle * (M_PI / 180.0);
-		double cosAngle = std::cos(radians);
-		double sinAngle = std::sin(radians);
-		return LibVector(LibPoint<T>(X() * cosAngle - Y() * sinAngle, X() * sinAngle + Y() * cosAngle));
-	};
-
-private:
-	T m_x;
-	T m_y;
-	T m_z;
 };
 
 template<typename T, typename S>

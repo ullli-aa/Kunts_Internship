@@ -150,6 +150,7 @@
     <ClCompile Include="LibVector.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LibCoordinates.h" />
     <ClInclude Include="LibCylinder.h" />
     <ClInclude Include="LibModel.h" />
     <ClInclude Include="LibSegment.h" />
