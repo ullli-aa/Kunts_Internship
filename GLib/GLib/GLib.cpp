@@ -21,9 +21,6 @@ typedef LibModel<double>::Surface Srfc;
 typedef LibRay<double> Ray;
 typedef LibThreadPool TP;
 
-std::ofstream out("data.bin", std::fstream::binary);
-std::ifstream in("data.bin", std::fstream::binary);
-
 class Tests {
 public:
 	void PointTest_DistanceTo() {
@@ -430,7 +427,10 @@ public:
 	void ModelTest_CubeIntersRay() {
 		Pt center(0.5, 0.5, 0.5);
 		Model cube = Model::CreateCube(center, 1.0);
+
+		std::ofstream out("data.bin", std::fstream::binary);
 		cube.Save(out);
+		out.close();
 
 		Ray ray(Pt(1.22, 2, 1.5), Vec(-1.72, -2, -1.5));
 		Pt pt; Srfc srfc;
@@ -439,24 +439,22 @@ public:
 		MY_ASSERT_VEC_EQ(Pt(0.36, 1, 0.75), pt);
 		MY_ASSERT_EQ(Srfc(2, 4), srfc);
 
-		/*Model cube2;
+		std::ifstream in("data.bin", std::fstream::binary);
+		Model cube2;
 		cube2.Load(in);
-		Pt pt2; Srfc srfc2;
-		pt2.Load(in);
-		MY_ASSERT_TRUE(pt.X() == pt2.X());
+		in.close();
 
-		MY_ASSERT_TRUE(cube == cube2);
+		Pt pt2; Srfc srfc2;
+
+		MY_ASSERT_TRUE(cube.Triangles() == cube2.Triangles());
 
 		MY_ASSERT_TRUE(cube2.IsIntersectionRay(ray, pt2, srfc2));
 		MY_ASSERT_VEC_EQ(pt2, pt);
-		MY_ASSERT_EQ(srfc2, srfc);*/
+		MY_ASSERT_EQ(srfc2, srfc);
 
 		ray.SetOrigin(Pt(0, 3, 1.5));
 		ray.SetDirection(Vec(-0.5, -3, -1.5));
 		MY_ASSERT_FALSE(cube.IsIntersectionRay(ray, pt, srfc));
-
-
-
 	}
 
 	void ModelTest_CylinderIntersRay() {
@@ -570,8 +568,6 @@ int main()
 	Tests test;
 	test.RunAllTests();
 	TIMER_PRINT();
-	out.close();
 }
 
-// vec, point, model (save, load)
 // qt диалог, open file. OpenGl
