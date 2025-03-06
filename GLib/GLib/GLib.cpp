@@ -11,6 +11,12 @@
 #include "LibRay.h"
 #include "LibThreadPool.h"
 
+//#include <QApplication>
+//#include <QWidget>
+//#include <QPushButton>
+//#include <QLabel>
+//#include <QVBoxLayout>
+
 typedef LibPoint<double> Pt;
 typedef LibTriangle<double> Trngl;
 typedef LibLine<double> Line;
@@ -446,7 +452,10 @@ public:
 
 		Pt pt2; Srfc srfc2;
 
+		MY_ASSERT_TRUE(cube.Points() == cube2.Points());
+		MY_ASSERT_TRUE(cube.Normals() == cube2.Normals());
 		MY_ASSERT_TRUE(cube.Triangles() == cube2.Triangles());
+		MY_ASSERT_TRUE(cube.Surfaces() == cube2.Surfaces());
 
 		MY_ASSERT_TRUE(cube2.IsIntersectionRay(ray, pt2, srfc2));
 		MY_ASSERT_VEC_EQ(pt2, pt);
@@ -568,6 +577,7 @@ int main()
 	Tests test;
 	test.RunAllTests();
 	TIMER_PRINT();
+	return 0;
 }
 
 // qt диалог, open file. OpenGl

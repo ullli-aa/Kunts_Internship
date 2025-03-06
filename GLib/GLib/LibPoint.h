@@ -21,9 +21,9 @@ public:
 
 	T SquareDistanceTo(const LibPoint<T>& other) const
 	{
-		return LibUtility<T>::Square(this->m_x - other.X()) +
-			LibUtility<T>::Square(this->m_y - other.Y()) +
-			LibUtility<T>::Square(this->m_z - other.Z());
+		return LibUtility::Square(this->m_x - other.X()) +
+			LibUtility::Square(this->m_y - other.Y()) +
+			LibUtility::Square(this->m_z - other.Z());
 	};
 
 	T DistanceTo(const LibPoint<T>& other) const
@@ -43,7 +43,7 @@ public:
 
 	bool IsEqual(const LibPoint<T>& other, double eps = 1e-9) const
 	{
-		return SquareDistanceTo(other) <= LibUtility<double>::Square(eps);
+		return SquareDistanceTo(other) <= LibUtility::Square(eps);
 	};
 
 };

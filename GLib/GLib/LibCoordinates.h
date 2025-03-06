@@ -50,11 +50,11 @@ public:
 	};
 
 	void Save(std::ostream& out) const {
-		LibUtility<T>::Save(out, m_x, 3 * sizeof(T));
+		LibUtility::SaveData(out, &m_x, 3);
 	}
 
 	void Load(std::istream& in) {
-		LibUtility<T>::Load(in, m_x, 3 * sizeof(T));
+		LibUtility::LoadData(in, &m_x, 3);
 	}
 
 protected:
