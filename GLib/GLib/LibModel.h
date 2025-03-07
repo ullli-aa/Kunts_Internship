@@ -347,11 +347,7 @@ public:
 
 		LibUtility::SaveVec(out, m_vecNormals);
 
-		size_t trianglesSize = m_vecTriangles.size();
-		LibUtility::Save(out, trianglesSize);
-		if (trianglesSize > 0) {
-			LibUtility::SaveData(out, m_vecTriangles.data(), trianglesSize);
-		}
+		LibUtility::SaveBuf(out, m_vecTriangles);
 
 		LibUtility::SaveVec(out, m_vecSurfaces);
 	}
@@ -360,10 +356,7 @@ public:
 		LibUtility::LoadVec(in, m_vecPoints);
 		LibUtility::LoadVec(in, m_vecNormals);
 
-		size_t trianglesSize = 0;
-		LibUtility::Load(in, trianglesSize);
-		m_vecTriangles.resize(trianglesSize);
-		LibUtility::LoadData(in, m_vecTriangles.data(), trianglesSize);
+		LibUtility::LoadBuf(in, m_vecTriangles);
 
 		LibUtility::LoadVec(in, m_vecSurfaces);
 	}

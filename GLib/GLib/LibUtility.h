@@ -23,9 +23,25 @@ public:
 	static void SaveData(std::ostream& out, const T* val, size_t amount) {
 		out.write(reinterpret_cast<const char*>(val), amount * sizeof(T));
 	}
+
 	template<typename T>
 	static void LoadData(std::istream& in, T* val, size_t amount) {
 		in.read(reinterpret_cast<char*>(val), amount * sizeof(T));
+	}
+
+	template<typename T>
+	static void SaveBuf(std::ostream& out, const std::vector<T>& vec) {
+		size_t size = vec.size();
+		LibUtility::Save(out, size);
+		SaveData(out, vec.data(), size);
+	}
+
+	template<typename T>
+	static void LoadBuf(std::istream& in, std::vector<T>& vec) {
+		size_t size = 0;
+		LibUtility::Load(in, size);
+		vec.resize(size);
+		LoadData(in, vec.data(), size);
 	}
 
 	template<typename T>

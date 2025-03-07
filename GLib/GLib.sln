@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GLib", "GLib\GLib.vcxproj", "{777D9938-4F8C-49A8-BE9F-8972A337BDB5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "QtApp", "QtApp\QtApp.vcxproj", "{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,14 @@ Global
 		{777D9938-4F8C-49A8-BE9F-8972A337BDB5}.Release|x64.Build.0 = Release|x64
 		{777D9938-4F8C-49A8-BE9F-8972A337BDB5}.Release|x86.ActiveCfg = Release|Win32
 		{777D9938-4F8C-49A8-BE9F-8972A337BDB5}.Release|x86.Build.0 = Release|Win32
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Debug|x64.ActiveCfg = Debug|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Debug|x64.Build.0 = Debug|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Debug|x86.ActiveCfg = Debug|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Debug|x86.Build.0 = Debug|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Release|x64.ActiveCfg = Release|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Release|x64.Build.0 = Release|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Release|x86.ActiveCfg = Release|x64
+		{0CE2AC6E-4C9A-4107-A45E-8B91ED85408A}.Release|x86.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
