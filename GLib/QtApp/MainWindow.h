@@ -2,6 +2,7 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include "../GLib/LibModel.h"
 
 class MainWindow : public QOpenGLWidget, protected QOpenGLFunctions {
 	Q_OBJECT
@@ -18,11 +19,17 @@ protected:
     void resizeGL(int w, int h) override
     {
         glViewport(0, 0, w, h);
+        // glOrtho
+        // матрица маштабирования
     }
 
     void paintGL() override
     {
         glClear(GL_COLOR_BUFFER_BIT);
+        // задать цвет рисования
+        // glBegin в конце glEnd
     }
+
+private:
 };
 

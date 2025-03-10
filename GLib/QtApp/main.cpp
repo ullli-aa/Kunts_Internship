@@ -1,3 +1,4 @@
+#include "../GLib/LibEps.cpp"
 #include "QtApp.h"
 #include <QtWidgets/QApplication>
 

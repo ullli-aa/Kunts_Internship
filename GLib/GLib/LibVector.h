@@ -1,11 +1,7 @@
 #pragma once
 
-#include "LibEps.h"
 #include "LibCoordinates.h"
-#include <cmath>
-#include <numbers>
-
-double M_PI = std::numbers::pi;
+#include "LibEps.h"
 
 template<typename T>
 class LibVector : public LibCoordinates<T>

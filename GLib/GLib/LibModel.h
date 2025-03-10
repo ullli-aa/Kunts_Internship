@@ -8,6 +8,8 @@
 #include "LibRay.h"
 #include "LibTimer.h"
 #include "LibThreadPool.h"
+#include "LibMatrix.h"
+#include "LibCylinder.h"
 
 template<typename T>
 class LibModel
@@ -255,7 +257,7 @@ public:
 			}
 		};
 
-		const size_t numThreads = std::thread::hardware_concurrency(); // количество потоков
+		const size_t numThreads = std::thread::hardware_concurrency();
 
 		std::vector<std::thread> threads;
 		std::vector<T> minDists(numThreads, DBL_MAX);

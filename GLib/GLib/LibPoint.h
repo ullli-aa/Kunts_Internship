@@ -4,7 +4,6 @@
 #include "LibVector.h"
 #include "LibCoordinates.h"
 #include "LibEps.h"
-#include <cmath>
 
 template<typename T>
 class LibPoint : public LibCoordinates<T> {

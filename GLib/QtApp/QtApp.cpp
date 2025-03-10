@@ -1,5 +1,4 @@
 #include "QtApp.h"
-#include "MainWindow.h"
 #include "QFileDialog"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
@@ -26,8 +25,6 @@ void QtApp::AddMenu() {
     menu->addWidget(but_OpenFile);
     connect(but_OpenFile, &QPushButton::clicked, this, &QtApp::OpenFileDialog);
 
-    // создать кубик и сохранить в файл
-
     // тут загружаю модель из файла
     // отрисовать модель
     // пример где рисуют треугольники без шейдеров. GLbegin, glEnd
@@ -39,7 +36,7 @@ void QtApp::AddMainWindow() {
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
-    format.setVersion(3, 2);
+    format.setVersion(2, 0);
     format.setProfile(QSurfaceFormat::CoreProfile);
     widget->setFormat(format);
 

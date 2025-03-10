@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include <stdexcept>
-#include <cmath>
 
 #define GREEN "\033[32m"
 #define RED "\033[31m"

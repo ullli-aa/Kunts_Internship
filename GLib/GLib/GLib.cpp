@@ -11,12 +11,6 @@
 #include "LibRay.h"
 #include "LibThreadPool.h"
 
-//#include <QApplication>
-//#include <QWidget>
-//#include <QPushButton>
-//#include <QLabel>
-//#include <QVBoxLayout>
-
 typedef LibPoint<double> Pt;
 typedef LibTriangle<double> Trngl;
 typedef LibLine<double> Line;
@@ -28,7 +22,7 @@ typedef LibRay<double> Ray;
 typedef LibThreadPool TP;
 
 class Tests {
-public:
+private:
 	void PointTest_DistanceTo() {
 		LibPoint<double> p1(1.0, 2.0, 3.0);
 		MY_ASSERT_DOUBLE_EQ(p1.DistanceTo(p1), 0.0);
@@ -540,6 +534,7 @@ public:
 
 	}
 
+public:
 	void RunAllTests() {
 		RUN_TEST(PointTest_DistanceTo);
 		RUN_TEST(PointTest_Operators);
@@ -570,14 +565,22 @@ public:
 		RUN_TEST(ModelTest_CylinderIntersRay);
 		RUN_TEST(ModelTest_BigCylinder);
 	}
+
+	void SaveCube() {
+		Pt center(0.5, 0.5, 0.5);
+		Model cube = Model::CreateCube(center, 1.0);
+
+		std::ofstream out("data.bin", std::fstream::binary);
+		cube.Save(out);
+		out.close();
+	}
 };
 
 int main()
 {
 	Tests test;
 	test.RunAllTests();
+	test.SaveCube();
 	TIMER_PRINT();
 	return 0;
 }
-
-// qt диалог, open file. OpenGl

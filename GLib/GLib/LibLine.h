@@ -102,11 +102,9 @@ public:
 			return dist.LengthVector();
 		}
 
-		//ищем вектор перпендикулярный плоскости, которая проходит через lnOther и параллельно this
 		LibVector<T> vecCross = m_vecDirection.CrossProduct(lnOther.m_ptDirection);
 		vecCross.NormalizeThis();
 
-		//свободный член уравнения плоскости
 		double coef = vecCross.DotProduct(lnOther.Origin());
 
 		return vecCross.DotProduct(this->Origin()) + coef;
@@ -150,4 +148,3 @@ protected:
 	LibPoint<T> m_ptOrigin;
 	LibVector<T> m_vecDirection;
 };
-

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "LibLine.h"
-#include <variant>
 
 template<typename T>
 class LibRay : public LibLine<T>

@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_QtApp.h"
+#include "MainWindow.h"
 
 class QtApp : public QMainWindow
 {
