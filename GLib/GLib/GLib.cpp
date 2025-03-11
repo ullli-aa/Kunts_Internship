@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include "MyTestMacros.h"
+#include "LibEps.h"
 #include "LibPoint.h"
 #include "LibVector.h"
 #include "LibMatrix.h"

@@ -12,6 +12,8 @@ QtApp::QtApp(QWidget *parent)
     showMaximized();
 
     AddMenu();
+
+    widget = new MainWindow(this);
     AddMainWindow();
 }
 
@@ -24,15 +26,9 @@ void QtApp::AddMenu() {
 
     menu->addWidget(but_OpenFile);
     connect(but_OpenFile, &QPushButton::clicked, this, &QtApp::OpenFileDialog);
-
-    // тут загружаю модель из файла
-    // отрисовать модель
-    // пример где рисуют треугольники без шейдеров. GLbegin, glEnd
-    
 }
 
 void QtApp::AddMainWindow() {
-    MainWindow* widget = new MainWindow(this);
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
@@ -48,4 +44,6 @@ void QtApp::OpenFileDialog() {
     if (fileName.isEmpty()) {
         qDebug() << "The file is not selected";
     }
+
+    widget->LoadModel(fileName.toStdString());
 }

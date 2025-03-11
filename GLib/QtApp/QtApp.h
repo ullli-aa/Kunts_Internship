@@ -12,12 +12,13 @@ public:
     QtApp(QWidget *parent = nullptr);
     ~QtApp();
 
-    void AddMenu();
-    void AddMainWindow();
-
 private slots:
     void OpenFileDialog();
 
 private:
+    void AddMenu();
+    void AddMainWindow();
+
     Ui::QtAppClass ui;
+    MainWindow* widget;
 };

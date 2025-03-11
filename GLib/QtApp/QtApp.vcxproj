@@ -60,20 +60,20 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Kunts_Internship\GLib\GLib;C:\Qt\6.8.2\msvc2022_64\include\QtOpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\6.8.2\msvc2022_64\include\QtOpenGL;C:\Qt\6.8.2\msvc2022_64\include\QtOpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\Kunts_Internship\GLib\GLib;C:\Qt\6.8.2\msvc2022_64\lib\cmake\Qt6OpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Qt6Core.lib;Qt6Gui.lib;Qt6Widgets.lib;Qt6OpenGL.lib;Qt6OpenglWidgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Qt\6.8.2\msvc2022_64\lib\cmake\Qt6OpenGL;C:\Qt\6.8.2\msvc2022_64\lib\cmake\Qt6OpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt6Core.lib;Qt6Gui.lib;Qt6Widgets.lib;Qt6OpenGL.lib;Qt6OpenglWidgets.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>D:\Kunts_Internship\GLib\GLib;C:\Qt\6.8.2\msvc2022_64\include\QtOpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Qt\6.8.2\msvc2022_64\include\QtOpenGL;C:\Qt\6.8.2\msvc2022_64\include\QtOpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>D:\Kunts_Internship\GLib\GLib;C:\Qt\6.8.2\msvc2022_64\lib\cmake\Qt6OpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Qt6Core.lib;Qt6Gui.lib;Qt6Widgets.lib;Qt6OpenGL.lib;Qt6OpenglWidgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Qt\6.8.2\msvc2022_64\lib\cmake\Qt6OpenGL;C:\Qt\6.8.2\msvc2022_64\lib\cmake\Qt6OpenGLWidgets;C:\Qt\6.8.2\msvc2022_64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Qt6Core.lib;Qt6Gui.lib;Qt6Widgets.lib;Qt6OpenGL.lib;Qt6OpenglWidgets.lib;opengl32.lib;glu32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">

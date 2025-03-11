@@ -1,7 +1,7 @@
 #pragma once
 
 #define _USE_MATH_DEFINES
-#include <cmath>
+#include <math.h>
 
 class LibEps
 {
@@ -11,6 +11,6 @@ public:
 	template<typename T>
 	static bool IsZero(T numb, double otherEps = 1e-9)
 	{
-		return std::fabs(numb) <= otherEps;
+		return fabs(numb) <= otherEps;
 	};
 };
