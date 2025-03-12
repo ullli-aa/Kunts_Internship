@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LibUtility.h"
+
 template<typename T>
 class LibCoordinates {
 public:

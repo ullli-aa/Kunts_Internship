@@ -79,6 +79,10 @@ public:
 		return result;
 	}
 
+	void operator*=(const LibMatrix<T>& other) {
+		*this = *this * other;
+	}
+
 	static LibVector<T> MultVec(const LibVector<T>& vec, const LibMatrix<T>& mtrx) {
 		LibVector<T> result;
 		result.SetX(mtrx[0][0] * vec.X() + mtrx[1][0] * vec.Y() + mtrx[2][0] * vec.Z());
@@ -249,19 +253,6 @@ public:
 		return res;
 	}
 
-	void Print()
-	{
-		int count = 0;
-		for (size_t i = 0; i < 16; i++)
-		{
-			++count;
-			
-			std::cerr << m_data[i] << ' ';
-			if (count % 4 == 0) {
-				std::cerr << '\n';
-			}
-		}
-	}
 protected:
 	T Determinate33(const T* matrix) const {
 		return matrix[0] * (matrix[4] * matrix[8] - matrix[5] * matrix[7]) -

@@ -35,5 +35,43 @@ void MainWindow::resizeGL(int w, int h) {
 
 void MainWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT);
+
+    glLoadMatrixd(m_camera.ApplyTransform().Data());
+
     PaintModel<double>();
+
+    glFlush();
+}
+
+void MainWindow::wheelEvent(QWheelEvent* event)
+{
+    if (event->angleDelta().y() > 0) {
+        m_camera.Scale(1.1);
+    }
+    else {
+        m_camera.Scale(1 / 1.1);
+    }
+    update();
+}
+
+void MainWindow::keyPressEvent(QKeyEvent* event)
+{
+    const double move = 0.1;
+
+    switch (event->key()) {
+    case Qt::Key_Up:
+        m_camera.Translation(LibVector<double>(0, move, 0));
+        break;
+    case Qt::Key_Down:
+        m_camera.Translation(LibVector<double>(0, -move, 0));
+        break;
+    case Qt::Key_Left:
+        m_camera.Translation(LibVector<double>(-move, 0, 0));
+        break;
+    case Qt::Key_Right:
+        m_camera.Translation(LibVector<double>(move, 0, 0));
+        break;
+    }
+
+    update();
 }

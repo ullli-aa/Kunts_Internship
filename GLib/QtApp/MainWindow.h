@@ -2,6 +2,8 @@
 
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
+#include <QWheelEvent>
+#include "Camera.h"
 #include "../GLib/LibModel.h"
 #include <fstream>
 
@@ -19,6 +21,10 @@ protected:
     void resizeGL(int w, int h) override;
 
     void paintGL() override;
+
+    void wheelEvent(QWheelEvent* event) override;
+
+    void keyPressEvent(QKeyEvent* event) override;
 
 private:
     template<typename T>
@@ -51,5 +57,6 @@ private:
     };
         
     LibModel<double> model;
+    Camera m_camera;
 };
 

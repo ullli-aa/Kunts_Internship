@@ -35,6 +35,11 @@ public:
 		return LibVector<T>(this->m_x + other.X(), this->m_y + other.Y(), this->m_z + other.Z());
 	};
 
+	void operator+=(const LibVector<T>& other)
+	{
+		*this = *this + other;
+	};
+
 	LibVector<T> operator-(const LibVector<T>& other) const
 	{
 		return LibVector<T>(this->m_x - other.X(), this->m_y - other.Y(), this->m_z - other.Z());
