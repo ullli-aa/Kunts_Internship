@@ -17,6 +17,12 @@ void Camera::Translation(const LibVector<double>& vec)
     m_translation += vec;
 }
 
+void Camera::Rotation(const LibVector<double>& vec, double angle)
+{
+    m_axis = vec;
+    m_angle = angle;
+}
+
 LibMatrix<double> Camera::ApplyTransform() const
 {
 
@@ -25,7 +31,6 @@ LibMatrix<double> Camera::ApplyTransform() const
 
     mtrx *=
         LibMatrix<double>::ScalingInit(LibVector<double>(m_scale, m_scale, m_scale));
-
     
 
     return mtrx;

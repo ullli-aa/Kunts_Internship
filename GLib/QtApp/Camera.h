@@ -13,6 +13,8 @@ public:
 
     void Translation(const LibVector<double>& vec);
 
+    void Rotation(const LibVector<double>& vec, double angle);
+
     LibMatrix<double> ApplyTransform() const;
 
 private:

@@ -26,6 +26,10 @@ protected:
 
     void keyPressEvent(QKeyEvent* event) override;
 
+    void mousePressEvent(QMouseEvent* event) override;
+    void mouseMoveEvent(QMouseEvent* event) override;
+    void mouseReleaseEvent(QMouseEvent* event) override;
+
 private:
     template<typename T>
     void DrawTriangle(const LibPoint<T>& A, const LibPoint<T>& B, const LibPoint<T>& C) {
@@ -58,5 +62,11 @@ private:
         
     LibModel<double> model;
     Camera m_camera;
+
+    bool m_isDragging;
+    QPoint m_lastMousePos;
+
+    const double move = 0.01;
+    const double scale = 1.1;
 };
 

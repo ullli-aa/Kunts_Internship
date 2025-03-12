@@ -1,6 +1,8 @@
 #include "MainWindow.h"
 
-MainWindow::MainWindow(QWidget* parent) : QOpenGLWidget(parent) {}
+MainWindow::MainWindow(QWidget* parent) : QOpenGLWidget(parent) {
+    setFocus();
+}
 
 void MainWindow::LoadModel(const std::string& filePath)
 {
@@ -8,6 +10,11 @@ void MainWindow::LoadModel(const std::string& filePath)
     if (!in.is_open()) {
         qWarning() << "Can't open file: " << filePath.c_str();
         return;
+    }
+
+    if (!model.Points().empty()) {
+        model.Clear();
+
     }
 
     model.Load(in);
@@ -46,18 +53,16 @@ void MainWindow::paintGL() {
 void MainWindow::wheelEvent(QWheelEvent* event)
 {
     if (event->angleDelta().y() > 0) {
-        m_camera.Scale(1.1);
+        m_camera.Scale(scale);
     }
     else {
-        m_camera.Scale(1 / 1.1);
+        m_camera.Scale(1 / scale);
     }
     update();
 }
 
 void MainWindow::keyPressEvent(QKeyEvent* event)
 {
-    const double move = 0.1;
-
     switch (event->key()) {
     case Qt::Key_Up:
         m_camera.Translation(LibVector<double>(0, move, 0));
@@ -74,4 +79,35 @@ void MainWindow::keyPressEvent(QKeyEvent* event)
     }
 
     update();
+}
+
+void MainWindow::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_isDragging = true;
+        m_lastMousePos = event->pos();
+                               }
+}
+
+void MainWindow::mouseMoveEvent(QMouseEvent* event)
+{
+    if (m_isDragging) {
+        QPoint delta = event->pos() - m_lastMousePos;
+
+        double newX = static_cast<double>(delta.x()) / height() * 2 * scale;
+        double newY = static_cast<double>(delta.y()) / height() * 2 * scale;
+
+        qDebug() << delta.y();
+        m_camera.Translation(LibVector<double>(newX, -newY, 0));
+
+        m_lastMousePos = event->pos();
+        update();
+    }
+}
+
+void MainWindow::mouseReleaseEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        m_isDragging = false;
+    }
 }

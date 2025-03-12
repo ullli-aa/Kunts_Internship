@@ -87,6 +87,13 @@ public:
 			Triangles() == other.Triangles() && Surfaces() == other.Surfaces();
 	}
 
+	void Clear() {
+		m_vecPoints.clear();
+		m_vecNormals.clear();
+		m_vecTriangles.clear();
+		m_vecSurfaces.clear();
+	}
+
 	static LibModel<T> CreateCube(const LibPoint<T>& center, T length)
 	{
 		T x = center.X(); T y = center.Y(); T z = center.Z();

@@ -574,6 +574,12 @@ public:
 		std::ofstream out("data.bin", std::fstream::binary);
 		cube.Save(out);
 		out.close();
+
+		Pt center2(0, 0, 0); Vec direction2(0, 0, 1);
+		Model cylinder = Model::CreateCylinder(center2, direction2, 1, 2, 1e-2);
+		std::ofstream out2("cylinder.bin", std::fstream::binary);
+		cylinder.Save(out2);
+		out2.close();
 	}
 };
 
