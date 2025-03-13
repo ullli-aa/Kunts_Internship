@@ -14,7 +14,7 @@ public:
 
 	~LibPoint() = default;
 
-	LibVector<T>& AsVector() const {
+	LibVector<T> AsVector() const {
 		return LibVector<T>(this->m_x, this->m_y, this->m_z);
 	}
 

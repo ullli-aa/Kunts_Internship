@@ -14,11 +14,11 @@ void MainWindow::LoadModel(const std::string& filePath)
 
     if (!model.Points().empty()) {
         model.Clear();
-
     }
 
     model.Load(in);
     in.close();
+    m_camera.Init(model);
 
     update();
 }
@@ -33,8 +33,7 @@ void MainWindow::resizeGL(int w, int h) {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    float aspectRatio = static_cast<float>(w) / static_cast<float>(h);
-    glOrtho(-aspectRatio, aspectRatio, -1.0, 1.0, -1.0, 1.0);
+    m_camera.Resize(w, h);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
@@ -43,7 +42,7 @@ void MainWindow::resizeGL(int w, int h) {
 void MainWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glLoadMatrixd(m_camera.ApplyTransform().Data());
+    glLoadMatrixd(m_camera.Apply());
 
     PaintModel<double>();
 
@@ -61,44 +60,19 @@ void MainWindow::wheelEvent(QWheelEvent* event)
     update();
 }
 
-void MainWindow::keyPressEvent(QKeyEvent* event)
-{
-    switch (event->key()) {
-    case Qt::Key_Up:
-        m_camera.Translation(LibVector<double>(0, move, 0));
-        break;
-    case Qt::Key_Down:
-        m_camera.Translation(LibVector<double>(0, -move, 0));
-        break;
-    case Qt::Key_Left:
-        m_camera.Translation(LibVector<double>(-move, 0, 0));
-        break;
-    case Qt::Key_Right:
-        m_camera.Translation(LibVector<double>(move, 0, 0));
-        break;
-    }
-
-    update();
-}
-
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         m_isDragging = true;
         m_lastMousePos = event->pos();
-                               }
+    }
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
     if (m_isDragging) {
         QPoint delta = event->pos() - m_lastMousePos;
-
-        double newX = static_cast<double>(delta.x()) / height() * 2 * scale;
-        double newY = static_cast<double>(delta.y()) / height() * 2 * scale;
-
-        qDebug() << delta.y();
-        m_camera.Translation(LibVector<double>(newX, -newY, 0));
+        m_camera.Translation(m_lastMousePos.x(), m_lastMousePos.y(), event->pos().x(), event->pos().y());
 
         m_lastMousePos = event->pos();
         update();

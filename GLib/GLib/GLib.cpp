@@ -317,6 +317,15 @@ private:
 
 		MY_ASSERT_TRUE(mtrx1 == mtrx1.InverseCopy().InverseCopy());
 		MY_ASSERT_TRUE(mtrx1 * mtrx1.InverseCopy() == Mtrx::IdentityMatrix());
+
+		double data[] = { 1.0, 2.0, 3.0, 4.0, 4.0, 1.0, 2.0, 3.0, 3.0, 4.0, 1.0, 2.0, 2.0, 3.0, 4.0, 1.0 };
+		LibMatrix<double> mtrx(data);
+
+		double inv[] = { -0.225, 0.275, 0.025, 0.025,
+			0.025, -0.225, 0.275, 0.025,
+			0.025, 0.025, -0.225, 0.275,
+			0.275, 0.025, 0.025, -0.225 };
+		MY_ASSERT_TRUE(inv == mtrx.InverseCopy());
 	}
 
 	void CylTest_IntersLine()

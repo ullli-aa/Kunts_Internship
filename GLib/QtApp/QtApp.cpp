@@ -37,8 +37,6 @@ void QtApp::AddMainWindow() {
     widget->setFormat(format);
 
     setCentralWidget(widget);
-
-    widget->LoadModel("../GLib/data.bin");
 }
 
 void QtApp::OpenFileDialog() {

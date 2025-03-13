@@ -23,9 +23,6 @@ protected:
     void paintGL() override;
 
     void wheelEvent(QWheelEvent* event) override;
-
-    void keyPressEvent(QKeyEvent* event) override;
-
     void mousePressEvent(QMouseEvent* event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
@@ -48,16 +45,15 @@ private:
 
             for (size_t i = 0; i < trnglsSize; i += 3)
             {
-                LibPoint<T> A = model.Points()[model.Triangles()[i]];
-                LibPoint<T> B = model.Points()[model.Triangles()[i + 1]];
-                LibPoint<T> C = model.Points()[model.Triangles()[i + 2]];
+                const LibPoint<T>& A = model.Points()[model.Triangles()[i]];
+                const LibPoint<T>& B = model.Points()[model.Triangles()[i + 1]];
+                const LibPoint<T>& C = model.Points()[model.Triangles()[i + 2]];
 
                 DrawTriangle(A, B, C);
             }
             glEnd();
 
         }
-        update();
     };
         
     LibModel<double> model;
@@ -66,7 +62,7 @@ private:
     bool m_isDragging;
     QPoint m_lastMousePos;
 
-    const double move = 0.01;
+    const double move = 1;
     const double scale = 1.1;
 };
 
