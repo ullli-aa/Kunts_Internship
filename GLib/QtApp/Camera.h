@@ -22,6 +22,10 @@ public:
 
     LibVector<double> PxlToMdlVec(int x_px, int y_px);
 
+    LibRay<double> GetRayFromPx(int x_px, int y_px);
+
+    bool IsIntersRayWithModel(int x_px, int y_px);
+
     const LibMatrix<double>& MdlToScrn() const;
 
     const LibMatrix<double>& ScrnToMdl() const;
@@ -32,7 +36,7 @@ public:
 
     void Translation(int deltaX, int deltaY);
 
-//    void Rotation(const LibVector<double>& vec, double angle);
+    //void Rotation(LibVector<double>);
 
     void Apply() const;
 
@@ -47,5 +51,7 @@ private:
 
     LibMatrix<double> m_ModelToScreen;
     LibMatrix<double> m_ScreenToModel;
+
+    LibModel<double> m_model;
 };
 

@@ -12,15 +12,16 @@ Camera::Camera() {
 
 void Camera::Init(const LibModel<double>& model)
 {
-    LibVector<double> delta = model.Diagonal();
+    m_model = model;
+    LibVector<double> diag = model.Diagonal();
 
-    double maxDelta = delta.LengthVector();
+    double maxDelta = diag.LengthVector();
 
     m_Scale = aspectRatio;
     if (maxDelta != 0) {
         m_Scale /= maxDelta;
     }
-    m_Translation = (-1) * delta / 2;
+    m_Translation = (-1) * diag / 2;
 
     Update();
 }
@@ -75,6 +76,24 @@ LibVector<double> Camera::PxlToMdlVec(int x_px, int y_px)
 {
     LibVector<double> scr = PxlToScrnVec(x_px, y_px);
     return LibMatrix<double>::MultVec(scr, ScrnToMdl());
+}
+
+LibRay<double> Camera::GetRayFromPx(int x_px, int y_px)
+{
+    LibPoint<double> origin = PxlToMdlPt(x_px, y_px);
+    origin.SetZ(-2 * m_model.Diagonal().LengthVector());
+
+    LibVector<double> direction = LibMatrix<double>::MultVec(LibVector<double>(0, 0, 1), m_ScreenToModel);
+    direction.NormalizeThis();
+
+    return LibRay<double>(origin, direction);
+}
+
+bool Camera::IsIntersRayWithModel(int x_px, int y_px)
+{
+    LibPoint<double> pt;
+    LibModel<double>::Surface srfc;
+    return m_model.IsIntersectionRay(GetRayFromPx(x_px, y_px), pt, srfc);
 }
 
 void Camera::Scale(double coef)

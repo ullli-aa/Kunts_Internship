@@ -72,7 +72,9 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
     if (m_isDragging) {
         QPoint delta = event->pos() - m_lastMousePos;
-        m_camera.Translation(delta.x(), delta.y());
+        if (m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y())) {
+            m_camera.Translation(delta.x(), delta.y());
+        }
 
         m_lastMousePos = event->pos();
         update();
