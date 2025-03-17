@@ -14,9 +14,13 @@ public:
 
     void Resize(int w, int h);
 
-    LibPoint<double> PxlToScrn(int x_px, int y_px) const;
+    LibPoint<double> PxlToScrnPt(int x_px, int y_px) const;
 
-    LibPoint<double> PxlToMdl(int x_px, int y_px);
+    LibVector<double> PxlToScrnVec(int x_px, int y_px) const;
+
+    LibPoint<double> PxlToMdlPt(int x_px, int y_px);
+
+    LibVector<double> PxlToMdlVec(int x_px, int y_px);
 
     const LibMatrix<double>& MdlToScrn() const;
 
@@ -26,11 +30,11 @@ public:
 
     void Scale(double coef);
 
-    void Translation(int begX, int begY, int endX, int endY);
+    void Translation(int deltaX, int deltaY);
 
 //    void Rotation(const LibVector<double>& vec, double angle);
 
-    const double* Apply() const;
+    void Apply() const;
 
 private:
     double m_Scale;

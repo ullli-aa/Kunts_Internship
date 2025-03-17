@@ -42,9 +42,9 @@ void MainWindow::resizeGL(int w, int h) {
 void MainWindow::paintGL() {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glLoadMatrixd(m_camera.Apply());
+    m_camera.Apply();
 
-    PaintModel<double>();
+    PaintModel();
 
     glFlush();
 }
@@ -52,10 +52,10 @@ void MainWindow::paintGL() {
 void MainWindow::wheelEvent(QWheelEvent* event)
 {
     if (event->angleDelta().y() > 0) {
-        m_camera.Scale(scale);
+        m_camera.Scale(m_scale);
     }
     else {
-        m_camera.Scale(1 / scale);
+        m_camera.Scale(1 / m_scale);
     }
     update();
 }
@@ -72,7 +72,7 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
     if (m_isDragging) {
         QPoint delta = event->pos() - m_lastMousePos;
-        m_camera.Translation(m_lastMousePos.x(), m_lastMousePos.y(), event->pos().x(), event->pos().y());
+        m_camera.Translation(delta.x(), delta.y());
 
         m_lastMousePos = event->pos();
         update();
@@ -83,5 +83,33 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         m_isDragging = false;
+    }
+}
+
+void MainWindow::DrawTriangle(const LibPoint<double>& A, const LibPoint<double>& B, const LibPoint<double>& C)
+{
+    glColor4d(1, 0, 0, 0.1);
+    glVertex3d(A.X(), A.Y(), A.Z());
+    glVertex3d(B.X(), B.Y(), B.Z());
+    glVertex3d(C.X(), C.Y(), C.Z());
+}
+
+void MainWindow::PaintModel()
+{
+    if (!model.Triangles().empty() && !model.Points().empty()) {
+        size_t trnglsSize = model.Triangles().size();
+
+        glBegin(GL_TRIANGLES);
+
+        for (size_t i = 0; i < trnglsSize; i += 3)
+        {
+            const LibPoint<double>& A = model.Points()[model.Triangles()[i]];
+            const LibPoint<double>& B = model.Points()[model.Triangles()[i + 1]];
+            const LibPoint<double>& C = model.Points()[model.Triangles()[i + 2]];
+
+            DrawTriangle(A, B, C);
+        }
+        glEnd();
+
     }
 }

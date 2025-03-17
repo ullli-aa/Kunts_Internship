@@ -94,6 +94,35 @@ public:
 		m_vecSurfaces.clear();
 	}
 
+	LibVector<T> Diagonal() const {
+		LibPoint<T> minPoint = { std::numeric_limits<T>::max(), std::numeric_limits<T>::max(), std::numeric_limits<T>::max() };
+		LibPoint<T> maxPoint = { std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest(), std::numeric_limits<T>::lowest() };
+
+		for (const auto& point : Points()) {
+			if (point.X() < minPoint.X()) {
+				minPoint.SetX(point.X());
+			}
+			if (point.Y() < minPoint.Y()) {
+				minPoint.SetY(point.Y());
+			}
+			if (point.Z() < minPoint.Z()) {
+				minPoint.SetZ(point.Z());
+			}
+
+			if (point.X() > maxPoint.X()) {
+				maxPoint.SetX(point.X());
+			}
+			if (point.Y() > maxPoint.Y()) {
+				maxPoint.SetY(point.Y());
+			}
+			if (point.Z() > maxPoint.Z()) {
+				maxPoint.SetZ(point.Z());
+			}
+		}
+		return maxPoint - minPoint;
+	};
+
+
 	static LibModel<T> CreateCube(const LibPoint<T>& center, T length)
 	{
 		T x = center.X(); T y = center.Y(); T z = center.Z();

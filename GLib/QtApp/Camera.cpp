@@ -12,34 +12,9 @@ Camera::Camera() {
 
 void Camera::Init(const LibModel<double>& model)
 {
-    LibPoint<double> minPoint = { std::numeric_limits<double>::max(), std::numeric_limits<double>::max(), std::numeric_limits<double>::max() };
-    LibPoint<double> maxPoint = { std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest(), std::numeric_limits<double>::lowest() };
+    LibVector<double> delta = model.Diagonal();
 
-    for (const auto& point : model.Points()) {
-        if (point.X() < minPoint.X()) {
-            minPoint.SetX(point.X());
-        }
-        if (point.Y() < minPoint.Y()) {
-            minPoint.SetY(point.Y());
-        }
-        if (point.Z() < minPoint.Z()) {
-            minPoint.SetZ(point.Z());
-        }
-
-        if (point.X() > maxPoint.X()) {
-            maxPoint.SetX(point.X());
-        }
-        if (point.Y() > maxPoint.Y()) {
-            maxPoint.SetY(point.Y());
-        }
-        if (point.Z() > maxPoint.Z()) {
-            maxPoint.SetZ(point.Z());
-        }
-    }
-
-    LibVector<double> delta = maxPoint - minPoint;
-
-    double maxDelta = std::max(delta.X(), delta.Y());
+    double maxDelta = delta.LengthVector();
 
     m_Scale = aspectRatio;
     if (maxDelta != 0) {
@@ -58,12 +33,18 @@ void Camera::Resize(int w, int h)
     glOrtho(-1.0, 1.0, -aspectRatio, aspectRatio, -1.0, 1.0);
 }
 
-LibPoint<double> Camera::PxlToScrn(int x_px, int y_px) const
+LibPoint<double> Camera::PxlToScrnPt(int x_px, int y_px) const
 {
     double x_scr = (2 * static_cast<double>(x_px) / m_Width - 1);
     double y_scr = (2 * static_cast<double>(y_px) / m_Height - 1) * aspectRatio;
 
     return LibPoint<double>(x_scr, -y_scr, 0);
+}
+
+LibVector<double> Camera::PxlToScrnVec(int vec_px, int vec_py) const
+{
+    LibPoint<double> scr = PxlToScrnPt(vec_px + m_Width / 2, vec_py + m_Height / 2);
+    return scr.AsVector();
 }
 
 const LibMatrix<double>& Camera::MdlToScrn() const
@@ -84,10 +65,16 @@ void Camera::Update()
     m_ScreenToModel = m_ModelToScreen.InverseCopy();
 }
 
-LibPoint<double> Camera::PxlToMdl(int x_px, int y_px)
+LibPoint<double> Camera::PxlToMdlPt(int x_px, int y_px)
 {
-    LibPoint<double> scrn = PxlToScrn(x_px, y_px);
+    LibPoint<double> scrn = PxlToScrnPt(x_px, y_px);
     return LibMatrix<double>::MultPt(scrn, ScrnToMdl());
+}
+
+LibVector<double> Camera::PxlToMdlVec(int x_px, int y_px)
+{
+    LibVector<double> scr = PxlToScrnVec(x_px, y_px);
+    return LibMatrix<double>::MultVec(scr, ScrnToMdl());
 }
 
 void Camera::Scale(double coef)
@@ -96,10 +83,10 @@ void Camera::Scale(double coef)
     Update();
 }
 
-void Camera::Translation(int begX, int begY, int endX, int endY)
+void Camera::Translation(int deltaX, int deltaY)
 {
-    LibVector<double> deltaModel = PxlToMdl(endX, endY) - PxlToMdl(begX, begY);
-    m_Translation += deltaModel;
+    LibVector<double> delta = PxlToMdlVec(deltaX, deltaY);
+    m_Translation += delta;
     Update();
 }
 
@@ -109,8 +96,9 @@ void Camera::Translation(int begX, int begY, int endX, int endY)
 //    m_angle = angle;
 //}
 
-const double* Camera::Apply() const
+void Camera::Apply() const
 {
-    return MdlToScrn().Data();
+    glLoadMatrixd(MdlToScrn().Data());
 }
+
 

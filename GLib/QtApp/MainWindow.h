@@ -28,33 +28,11 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
-    template<typename T>
-    void DrawTriangle(const LibPoint<T>& A, const LibPoint<T>& B, const LibPoint<T>& C) {
-        glColor4d(1, 0, 0, 0.1);
-        glVertex3d(A.X(), A.Y(), A.Z());
-        glVertex3d(B.X(), B.Y(), B.Z());
-        glVertex3d(C.X(), C.Y(), C.Z());
-    }
+    void DrawTriangle(const LibPoint<double>& A,
+        const LibPoint<double>& B,
+        const LibPoint<double>& C);
 
-    template<typename T>
-    void PaintModel() {
-        if (!model.Triangles().empty() && !model.Points().empty()) {
-            size_t trnglsSize = model.Triangles().size();
-
-            glBegin(GL_TRIANGLES);
-
-            for (size_t i = 0; i < trnglsSize; i += 3)
-            {
-                const LibPoint<T>& A = model.Points()[model.Triangles()[i]];
-                const LibPoint<T>& B = model.Points()[model.Triangles()[i + 1]];
-                const LibPoint<T>& C = model.Points()[model.Triangles()[i + 2]];
-
-                DrawTriangle(A, B, C);
-            }
-            glEnd();
-
-        }
-    };
+    void PaintModel();
         
     LibModel<double> model;
     Camera m_camera;
@@ -62,7 +40,6 @@ private:
     bool m_isDragging;
     QPoint m_lastMousePos;
 
-    const double move = 1;
-    const double scale = 1.1;
+    const double m_scale = 1.1;
 };
 
