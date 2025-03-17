@@ -25,6 +25,11 @@ public:
 			LibUtility::Square(this->m_z - other.Z());
 	};
 
+	static LibPoint<T> Zero() {
+		static LibPoint<T> zero(0, 0, 0);
+		return zero;
+	}
+
 	T DistanceTo(const LibPoint<T>& other) const
 	{
 		return std::sqrt(SquareDistanceTo(other));

@@ -34,10 +34,11 @@ private:
 
     void PaintModel();
         
-    LibModel<double> model;
+    LibModel<double> m_model;
     Camera m_camera;
 
-    bool m_isDragging;
+    bool m_isDragTransl = false;
+    bool m_isDragRotat = false;
     QPoint m_lastMousePos;
 
     const double m_scale = 1.1;

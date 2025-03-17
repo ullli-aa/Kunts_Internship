@@ -12,13 +12,13 @@ void MainWindow::LoadModel(const std::string& filePath)
         return;
     }
 
-    if (!model.Points().empty()) {
-        model.Clear();
+    if (!m_model.Points().empty()) {
+        m_model.Clear();
     }
 
-    model.Load(in);
+    m_model.Load(in);
     in.close();
-    m_camera.Init(model);
+    m_camera.Init(m_model);
 
     update();
 }
@@ -63,34 +63,41 @@ void MainWindow::wheelEvent(QWheelEvent* event)
 void MainWindow::mousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_isDragging = true;
+        m_isDragTransl = true;
+        m_lastMousePos = event->pos();
+    }
+    else if (event->button() == Qt::RightButton) {
+        m_isDragRotat = true;
         m_lastMousePos = event->pos();
     }
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
-    if (m_isDragging) {
+    if (m_isDragTransl) {
         QPoint delta = event->pos() - m_lastMousePos;
         if (m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y())) {
             m_camera.Translation(delta.x(), delta.y());
-        }
-
-        m_lastMousePos = event->pos();
-        update();
+        } 
+    } else if (m_isDragRotat) {
+        m_camera.Rotation(m_lastMousePos.x(), m_lastMousePos.y(), event->pos().x(), event->pos().y());
     }
+    m_lastMousePos = event->pos();
+    update();
 }
 
 void MainWindow::mouseReleaseEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
-        m_isDragging = false;
+        m_isDragTransl = false;
+    } else if (event->button() == Qt::RightButton) {
+        m_isDragRotat = false;
     }
 }
 
 void MainWindow::DrawTriangle(const LibPoint<double>& A, const LibPoint<double>& B, const LibPoint<double>& C)
 {
-    glColor4d(1, 0, 0, 0.1);
+    glColor4d(1, 0, 0, 0.01);
     glVertex3d(A.X(), A.Y(), A.Z());
     glVertex3d(B.X(), B.Y(), B.Z());
     glVertex3d(C.X(), C.Y(), C.Z());
@@ -98,16 +105,16 @@ void MainWindow::DrawTriangle(const LibPoint<double>& A, const LibPoint<double>&
 
 void MainWindow::PaintModel()
 {
-    if (!model.Triangles().empty() && !model.Points().empty()) {
-        size_t trnglsSize = model.Triangles().size();
+    if (!m_model.Triangles().empty() && !m_model.Points().empty()) {
+        size_t trnglsSize = m_model.Triangles().size();
 
         glBegin(GL_TRIANGLES);
 
         for (size_t i = 0; i < trnglsSize; i += 3)
         {
-            const LibPoint<double>& A = model.Points()[model.Triangles()[i]];
-            const LibPoint<double>& B = model.Points()[model.Triangles()[i + 1]];
-            const LibPoint<double>& C = model.Points()[model.Triangles()[i + 2]];
+            const LibPoint<double>& A = m_model.Points()[m_model.Triangles()[i]];
+            const LibPoint<double>& B = m_model.Points()[m_model.Triangles()[i + 1]];
+            const LibPoint<double>& C = m_model.Points()[m_model.Triangles()[i + 2]];
 
             DrawTriangle(A, B, C);
         }

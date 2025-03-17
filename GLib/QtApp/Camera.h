@@ -36,16 +36,18 @@ public:
 
     void Translation(int deltaX, int deltaY);
 
-    //void Rotation(LibVector<double>);
+    void Rotation(int f_x, int f_y, int s_x, int s_y);
 
     void Apply() const;
 
 private:
+    LibVector<double> VecOnSphere(int x, int y, double radius2);
+
     double m_Scale;
     LibVector<double> m_Translation;
     LibMatrix<double> m_Rotation;
 
-    double aspectRatio;
+    double m_aspectRatio;
     int m_Width;
     int m_Height;
 

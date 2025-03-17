@@ -17,7 +17,7 @@ void Camera::Init(const LibModel<double>& model)
 
     double maxDelta = diag.LengthVector();
 
-    m_Scale = aspectRatio;
+    m_Scale = m_aspectRatio;
     if (maxDelta != 0) {
         m_Scale /= maxDelta;
     }
@@ -28,16 +28,16 @@ void Camera::Init(const LibModel<double>& model)
 
 void Camera::Resize(int w, int h)
 {
-    aspectRatio = static_cast<double>(h) / static_cast<double>(w);
+    m_aspectRatio = static_cast<double>(h) / static_cast<double>(w);
     m_Width = w;
     m_Height = h;
-    glOrtho(-1.0, 1.0, -aspectRatio, aspectRatio, -1.0, 1.0);
+    glOrtho(-1.0, 1.0, -m_aspectRatio, m_aspectRatio, -1.0, 1.0);
 }
 
 LibPoint<double> Camera::PxlToScrnPt(int x_px, int y_px) const
 {
     double x_scr = (2 * static_cast<double>(x_px) / m_Width - 1);
-    double y_scr = (2 * static_cast<double>(y_px) / m_Height - 1) * aspectRatio;
+    double y_scr = (2 * static_cast<double>(y_px) / m_Height - 1) * m_aspectRatio;
 
     return LibPoint<double>(x_scr, -y_scr, 0);
 }
@@ -80,8 +80,9 @@ LibVector<double> Camera::PxlToMdlVec(int x_px, int y_px)
 
 LibRay<double> Camera::GetRayFromPx(int x_px, int y_px)
 {
-    LibPoint<double> origin = PxlToMdlPt(x_px, y_px);
+    LibPoint<double> origin = PxlToScrnPt(x_px, y_px);
     origin.SetZ(-2 * m_model.Diagonal().LengthVector());
+    origin = LibMatrix<double>::MultPt(origin, m_ScreenToModel);
 
     LibVector<double> direction = LibMatrix<double>::MultVec(LibVector<double>(0, 0, 1), m_ScreenToModel);
     direction.NormalizeThis();
@@ -109,15 +110,31 @@ void Camera::Translation(int deltaX, int deltaY)
     Update();
 }
 
-//void Camera::Rotation(const LibVector<double>& vec, double angle)
-//{
-//    m_axis = vec;
-//    m_angle = angle;
-//}
+void Camera::Rotation(int f_x, int f_y, int s_x, int s_y)
+{
+    double radius2 = LibUtility::Square(m_aspectRatio) + 1;
+
+    LibVector<double> f_vec = VecOnSphere(f_x, f_y, radius2);
+    LibVector<double> s_vec = VecOnSphere(s_x, s_y, radius2);
+
+    LibVector<double> axis = LibMatrix<double>::MultVec(f_vec.CrossProduct(s_vec), ScrnToMdl());
+    double angle = f_vec.AngleTo(s_vec, axis);
+
+    m_Rotation *= LibMatrix<double>::Rotation(axis, angle);
+    Update();
+}
 
 void Camera::Apply() const
 {
     glLoadMatrixd(MdlToScrn().Data());
+}
+
+LibVector<double> Camera::VecOnSphere(int x, int y, double radius2)
+{
+    LibPoint<double> pt = PxlToScrnPt(x, y);
+    double dstnc = pt.SquareDistanceTo(LibPoint<double>::Zero());
+    pt.SetZ(std::sqrt(radius2 - dstnc));
+    return pt - LibPoint<double>::Zero();
 }
 
 
