@@ -117,8 +117,9 @@ void Camera::Rotation(int f_x, int f_y, int s_x, int s_y)
     LibVector<double> f_vec = VecOnSphere(f_x, f_y, radius2);
     LibVector<double> s_vec = VecOnSphere(s_x, s_y, radius2);
 
-    LibVector<double> axis = LibMatrix<double>::MultVec(f_vec.CrossProduct(s_vec), ScrnToMdl());
-    double angle = f_vec.AngleTo(s_vec, axis);
+    LibVector<double> cross = f_vec.CrossProduct(s_vec);
+    LibVector<double> axis = LibMatrix<double>::MultVec(cross, ScrnToMdl());
+    double angle = f_vec.AngleTo(s_vec, cross);
 
     m_Rotation *= LibMatrix<double>::Rotation(axis, angle);
     Update();
