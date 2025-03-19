@@ -31,7 +31,6 @@ void MainWindow::initializeGL() {
     glLoadIdentity();
 
     glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
 
     GLfloat lmodel_ambient[] = { 0.2f,0.2f,0.2f,1.0f };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
@@ -42,32 +41,27 @@ void MainWindow::initializeGL() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_SMOOTH);
 
-    GLfloat light0_position[] = { 0.0f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
-    GLfloat diffuse_light0[] = { 0.1f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light0);
+    GLfloat light_positions[8][4] = {
+        {-1.0f, -1.0f, -1.0f, 0.0f},
+        {-1.0f, 1.0f, -1.0f, 0.0f},
+        {1.0f, 1.0f, -1.0f, 0.0f},
+        {1.0f, -1.0f, -1.0f, 0.0f},
+        {-1.0f, -1.0f, 1.0f, 0.0f},
+        {-1.0f, 1.0f, 1.0f, 0.0f},
+        {1.0f, 1.0f, 1.0f, 0.0f},
+        {1.0f, -1.0f, 1.0f, 0.0f}
+    };
 
-    glEnable(GL_LIGHT1);
-    GLfloat light1_position[] = { 0.0f, 1.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
+    GLfloat diffuse_color[] = {0.2f, 0.2f, 0.2f, 1.0f};
 
-    GLfloat diffuse_light1[] = { 0.1f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT1, GL_DIFFUSE, diffuse_light1);
-
-    glEnable(GL_LIGHT2);
-    GLfloat light2_position[] = { 1.0f, 1.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT2, GL_POSITION, light2_position);
-
-    GLfloat diffuse_light2[] = { 0.1f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT2, GL_DIFFUSE, diffuse_light2);
-
-    glEnable(GL_LIGHT3);
-    GLfloat light3_position[] = { 1.0f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT3, GL_POSITION, light3_position);
-
-    GLfloat diffuse_light3[] = { 0.1f, 0.0f, 0.0f, 1.0f };
-    glLightfv(GL_LIGHT3, GL_DIFFUSE, diffuse_light3);
+    for (int i = 0; i < 8; i++) {
+        glEnable(GL_LIGHT0 + i);
+        glLightfv(GL_LIGHT0 + i, GL_POSITION, light_positions[i]);
+        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse_color);
+    }
 }
 
 void MainWindow::resizeGL(int w, int h) {
@@ -86,16 +80,17 @@ void MainWindow::paintGL() {
 
     m_camera.Apply();
 
-    GLfloat mat_ambient[] = { 0.2f, 0.0f, 0.0f, 1.0f };
+    GLfloat mat_ambient[] = { 0.2f, 0.2f, 0.2f, 1.0f };
     GLfloat mat_diffuse[] = { 0.5f, 0.0f, 0.0f, 1.0f };
 
-    glMaterialfv(GL_FRONT, GL_AMBIENT, mat_ambient);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 
     PaintModel();
 
     glFlush();
 }
+
 
 void MainWindow::wheelEvent(QWheelEvent* event)
 {
@@ -147,29 +142,30 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event)
     }
 }
 
-void MainWindow::DrawTriangle(const LibPoint<double>& A, const LibPoint<double>& B, const LibPoint<double>& C)
-{
-    glVertex3d(A.X(), A.Y(), A.Z());
-    glVertex3d(B.X(), B.Y(), B.Z());
-    glVertex3d(C.X(), C.Y(), C.Z());
-}
-
 void MainWindow::PaintModel()
 {
     if (!m_model.Triangles().empty() && !m_model.Points().empty()) {
-        size_t trnglsSize = m_model.Triangles().size();
-
         glBegin(GL_TRIANGLES);
-
-        for (size_t i = 0; i < trnglsSize; i += 3)
+        for (size_t i = 0; i < m_model.TrinaglesNum(); i++)
         {
-            const LibPoint<double>& A = m_model.Points()[m_model.Triangles()[i]];
-            const LibPoint<double>& B = m_model.Points()[m_model.Triangles()[i + 1]];
-            const LibPoint<double>& C = m_model.Points()[m_model.Triangles()[i + 2]];
+            const LibPoint<double>& A = m_model.GetPtInTrngl(i, 0);
+            const LibPoint<double>& B = m_model.GetPtInTrngl(i, 1);
+            const LibPoint<double>& C = m_model.GetPtInTrngl(i, 2);
 
-            DrawTriangle(A, B, C);
+            const LibVector<double>& nA = m_model.GetNrmlsInTrngl(i, 0);
+            const LibVector<double>& nB = m_model.GetNrmlsInTrngl(i, 0);
+            const LibVector<double>& nC = m_model.GetNrmlsInTrngl(i, 0);
+
+            glNormal3d(nA.X(), nA.Y(), nA.Z());
+            glVertex3d(A.X(), A.Y(), A.Z());
+
+            glNormal3d(nB.X(), nB.Y(), nB.Z());
+            glVertex3d(B.X(), B.Y(), B.Z());
+
+            glNormal3d(nC.X(), nC.Y(), nC.Z());
+            glVertex3d(C.X(), C.Y(), C.Z());
+
         }
         glEnd();
-
     }
 }

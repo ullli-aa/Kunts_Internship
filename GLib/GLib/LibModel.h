@@ -62,6 +62,26 @@ public:
 
 	~LibModel() = default;
 
+	inline size_t TrinaglesNum() const { return m_vecTriangles.size() / 3; }
+	inline size_t GetPointIndex(size_t idxTriangle, size_t idxPoint) const { return m_vecTriangles[idxTriangle * 3 + idxPoint]; }
+	inline size_t GetPointIndex(const Surface& srf, size_t idxTriangle, size_t idxPoint) const { return m_vecTriangles[srf.Begin() * 3 + idxTriangle * 3 + idxPoint]; }
+
+	inline const LibPoint<T>& GetPtInTrngl(size_t idxTriangle, size_t pos) const {
+		return m_vecPoints[GetPointIndex(idxTriangle, pos)];
+	}
+
+	inline const LibPoint<T>& GetPtInTrngl(const Surface& srf, size_t idxTriangle, size_t pos) const {
+		return m_vecPoints[GetPointIndex(srf, idxTriangle, pos)];
+	}
+
+	const LibVector<T>& GetNrmlsInTrngl(size_t idxTriangle, size_t pos) const {
+		return m_vecNormals[GetPointIndex(idxTriangle, pos)];
+	}
+
+	const LibVector<T>& GetNrmlsInTrngl(const Surface& srf, size_t idxTriangle, size_t pos) const {
+		return m_vecNormals[GetPointIndex(srf, idxTriangle, pos)];
+	}
+
 	inline const std::vector<LibPoint<T>>& Points() const
 	{
 		return m_vecPoints;
@@ -376,10 +396,6 @@ public:
 		return true;
 	}
 
-	const LibPoint<T>& FindTrnglPt(size_t ind, size_t pos) const {
-		return m_vecPoints[m_vecTriangles[ind * 3 + pos]];
-	}
-
 	void Save(std::ostream& out) const {
 		LibUtility::SaveVec(out, m_vecPoints);
 
@@ -439,8 +455,15 @@ protected:
 		for (size_t i = 1; i <= pntsCountOnCrcl; ++i)
 		{
 			vecTriangles.push_back(pntsCount);
-			vecTriangles.push_back(pntsCount + i);
-			vecTriangles.push_back(pntsCount + 1 + i % (pntsCountOnCrcl));
+			if (dirCoef == -1) {
+				vecTriangles.push_back(pntsCount + 1 + i % (pntsCountOnCrcl));
+				vecTriangles.push_back(pntsCount + i);
+			}
+			else {
+				vecTriangles.push_back(pntsCount + i);
+				vecTriangles.push_back(pntsCount + 1 + i % (pntsCountOnCrcl));
+			}
+			
 		}
 		vecSurfaces.push_back(Surface(trnglsCount, vecTriangles.size() / 3));
 	}

@@ -28,10 +28,6 @@ protected:
     void mouseReleaseEvent(QMouseEvent* event) override;
 
 private:
-    void DrawTriangle(const LibPoint<double>& A,
-        const LibPoint<double>& B,
-        const LibPoint<double>& C);
-
     void PaintModel();
         
     LibModel<double> m_model;

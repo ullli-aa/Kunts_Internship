@@ -428,7 +428,7 @@ private:
 		MY_ASSERT_EQ(cylinder.Triangles().size(), 36);
 		MY_ASSERT_EQ(cylinder.Surfaces().size(), 3);
 
-		std::vector<size_t> exp = { 0, 1, 2, 0, 2, 3, 0, 3, 1,
+		std::vector<size_t> exp = { 0, 2, 1, 0, 3, 2, 0, 1, 3,
 			4, 5, 6, 4, 6, 7, 4, 7, 5,
 			1, 2, 6, 1, 6, 5, 2, 3, 7, 2, 7, 6, 3, 1, 5, 3, 5, 7 };
 		MY_ASSERT_EQ(exp, cylinder.Triangles());
