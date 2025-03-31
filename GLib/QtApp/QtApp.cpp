@@ -32,7 +32,7 @@ void QtApp::AddMainWindow() {
     QSurfaceFormat format;
     format.setDepthBufferSize(24);
     format.setStencilBufferSize(8);
-    format.setVersion(2, 0);
+    format.setVersion(3, 3);
     format.setProfile(QSurfaceFormat::CoreProfile);
     widget->setFormat(format);
 
@@ -45,5 +45,5 @@ void QtApp::OpenFileDialog() {
         qDebug() << "The file is not selected";
     }
 
-    widget->LoadModel(fileName.toStdString());
+    widget->LoadModel(fileName.toStdWString());
 }

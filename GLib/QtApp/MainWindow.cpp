@@ -4,7 +4,7 @@ MainWindow::MainWindow(QWidget* parent) : QOpenGLWidget(parent) {
     setFocus();
 }
 
-void MainWindow::LoadModel(const std::string& filePath)
+void MainWindow::LoadModel(const std::wstring& filePath)
 {
     std::ifstream in(filePath, std::ios::binary);
     if (!in.is_open()) {
@@ -19,6 +19,7 @@ void MainWindow::LoadModel(const std::string& filePath)
     m_model.Load(in);
     in.close();
     m_camera.Init(m_model);
+    m_upd = true;
 
     update();
 }
@@ -44,6 +45,8 @@ void MainWindow::initializeGL() {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
+    glEnable(GL_DEPTH_TEST);
+
     GLfloat light_positions[8][4] = {
         {-1.0f, -1.0f, -1.0f, 0.0f},
         {-1.0f, 1.0f, -1.0f, 0.0f},
@@ -62,6 +65,20 @@ void MainWindow::initializeGL() {
         glLightfv(GL_LIGHT0 + i, GL_POSITION, light_positions[i]);
         glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse_color);
     }
+    
+    glGenVertexArrays(1, &m_vao);
+    glBindVertexArray(m_vao);
+
+    glGenBuffers(1, &m_vboVertices);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
+
+    glGenBuffers(1, &m_vboNormals);
+    glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+
+    glGenBuffers(1, &m_vboTriangles);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
+
+    glBindVertexArray(0);
 }
 
 void MainWindow::resizeGL(int w, int h) {
@@ -76,7 +93,41 @@ void MainWindow::resizeGL(int w, int h) {
 }
 
 void MainWindow::paintGL() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    if (m_upd) {
+        m_upd = false;
+
+        glBindVertexArray(m_vao);
+
+        const GLdouble* vertexData = reinterpret_cast<const GLdouble*>(m_model.Points().data());
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
+        glBufferData(GL_ARRAY_BUFFER, m_model.Points().size() * 3 * sizeof(GLdouble),
+            vertexData, GL_STATIC_DRAW);
+
+        const GLdouble* normalsData = reinterpret_cast<const GLdouble*>(m_model.Normals().data());
+        
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+        glBufferData(GL_ARRAY_BUFFER, m_model.Normals().size() * 3 * sizeof(GLdouble),
+            normalsData, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.Triangles().size() * sizeof(size_t),
+            m_model.Triangles().data(), GL_STATIC_DRAW);
+
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
+        glVertexPointer(3, GL_DOUBLE, 0, 0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+        glNormalPointer(GL_DOUBLE, 0, 0);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
+
+        glBindVertexArray(0);
+    }
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     m_camera.Apply();
 
@@ -86,7 +137,12 @@ void MainWindow::paintGL() {
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 
-    PaintModel();
+    glBindVertexArray(m_vao);
+
+    glDrawElements(GL_TRIANGLES, m_model.Triangles().size(), GL_UNSIGNED_INT, nullptr);
+    glBindVertexArray(0);
+
+    //PaintModel();
 
     glFlush();
 }

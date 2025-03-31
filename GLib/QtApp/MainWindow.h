@@ -1,19 +1,19 @@
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_core.h>
 #include <QWheelEvent>
 #include "Camera.h"
 #include "../GLib/LibModel.h"
 #include <fstream>
 
-class MainWindow : public QOpenGLWidget, protected QOpenGLFunctions {
+class MainWindow : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
 	Q_OBJECT
 
 public:
     MainWindow(QWidget* parent = nullptr);
 
-    void LoadModel(const std::string& filePath);
+    void LoadModel(const std::wstring& filePath);
 
 protected:
     void initializeGL() override;
@@ -38,5 +38,12 @@ private:
     QPoint m_lastMousePos;
 
     const double m_scale = 1.1;
+
+    GLuint m_vao;
+    GLuint m_vboVertices;
+    GLuint m_vboNormals;
+    GLuint m_vboTriangles;
+
+    bool m_upd = false;
 };
 
