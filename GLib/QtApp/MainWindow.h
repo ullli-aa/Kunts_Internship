@@ -27,9 +27,7 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
-private:
-    void PaintModel();
-        
+private:        
     LibModel<double> m_model;
     Camera m_camera;
 

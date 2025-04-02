@@ -12,28 +12,18 @@ Camera::Camera() {
 
 void Camera::Init(const LibModel<double>& model)
 {
-    if (!m_model.Points().empty()) {
-        Scale(m_model.Diagonal().LengthVector());
-        m_Translation += m_model.Diagonal() / 2;
-    }
-
     m_model = model;
     LibVector<double> diag = model.Diagonal();
 
     double maxDelta = diag.LengthVector();
 
-    if (m_Scale == 1) {
-        m_Scale = m_aspectRatio;
-    }
-
+    m_Scale = m_aspectRatio;
     if (maxDelta != 0) {
         m_Scale /= maxDelta;
     }
     
-    if (m_Translation == LibVector<double>(0, 0, 0)) {
-        m_Translation = (-1) * diag / 2;
-    }
-
+    m_Translation = (-1) * diag / 2;
+    
     Update();
 }
 

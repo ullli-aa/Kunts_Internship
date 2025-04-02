@@ -91,8 +91,8 @@ void *MainWindow::qt_metacast(const char *_clname)
     if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_ZN10MainWindowE.stringdata0))
         return static_cast<void*>(this);
-    if (!strcmp(_clname, "QOpenGLFunctions_3_3_Core"))
-        return static_cast< QOpenGLFunctions_3_3_Core*>(this);
+    if (!strcmp(_clname, "QOpenGLFunctions_3_0"))
+        return static_cast< QOpenGLFunctions_3_0*>(this);
     return QOpenGLWidget::qt_metacast(_clname);
 }
 
