@@ -24,7 +24,7 @@ public:
 
     LibRay<double> GetRayFromPx(int x_px, int y_px);
 
-    bool IsIntersRayWithModel(int x_px, int y_px);
+    bool IsIntersRayWithModel(int x_px, int y_px, int& srfc);
 
     const LibMatrix<double>& MdlToScrn() const;
 

@@ -33,7 +33,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;">
     <ClCompile>
-      <AdditionalIncludeDirectories>C:\Users\julia\AppData\Local\Temp\jasonshh.kll;C:\Qt\6.8.2\msvc2022_64\include;C:\Qt\6.8.2\msvc2022_64\include\QtWidgets;C:\Qt\6.8.2\msvc2022_64\include\QtGui;C:\Qt\6.8.2\msvc2022_64\include\QtCore;C:\Users\julia\AppData\Local\Temp\jasonshh.kll;/include;C:\Qt\6.8.2\msvc2022_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\julia\AppData\Local\Temp\ga2qfd5h.1zv;C:\Qt\6.8.2\msvc2022_64\include;C:\Qt\6.8.2\msvc2022_64\include\QtWidgets;C:\Qt\6.8.2\msvc2022_64\include\QtGui;C:\Qt\6.8.2\msvc2022_64\include\QtCore;C:\Users\julia\AppData\Local\Temp\ga2qfd5h.1zv;/include;C:\Qt\6.8.2\msvc2022_64\mkspecs\win32-msvc;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -utf-8 %(AdditionalOptions)</AdditionalOptions>
       <AssemblerListingLocation>.\</AssemblerListingLocation>
       <BrowseInformation>false</BrowseInformation>

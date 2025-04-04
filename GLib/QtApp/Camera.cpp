@@ -82,19 +82,18 @@ LibVector<double> Camera::PxlToMdlVec(int x_px, int y_px)
 LibRay<double> Camera::GetRayFromPx(int x_px, int y_px)
 {
     LibPoint<double> origin = PxlToScrnPt(x_px, y_px);
-    origin.SetZ(-2 * m_model.Diagonal().LengthVector());
+    origin.SetZ(1000);
     origin = LibMatrix<double>::MultPt(origin, m_ScreenToModel);
 
-    LibVector<double> direction = LibMatrix<double>::MultVec(LibVector<double>(0, 0, 1), m_ScreenToModel);
+    LibVector<double> direction = LibMatrix<double>::MultVec(LibVector<double>(0, 0, -1), m_ScreenToModel);
     direction.NormalizeThis();
 
     return LibRay<double>(origin, direction);
 }
 
-bool Camera::IsIntersRayWithModel(int x_px, int y_px)
+bool Camera::IsIntersRayWithModel(int x_px, int y_px, int& srfc)
 {
     LibPoint<double> pt;
-    LibModel<double>::Surface srfc;
     return m_model.IsIntersectionRay(GetRayFromPx(x_px, y_px), pt, srfc);
 }
 

@@ -2,6 +2,7 @@
 
 MainWindow::MainWindow(QWidget* parent) : QOpenGLWidget(parent) {
     setFocus();
+    setMouseTracking(true);
 }
 
 void MainWindow::LoadModel(const std::wstring& filePath)
@@ -33,7 +34,7 @@ void MainWindow::initializeGL() {
 
     glEnable(GL_LIGHTING);
 
-    GLfloat lmodel_ambient[] = { 0.5f, 0.5f, 0.5f, 1.0f };
+    GLfloat lmodel_ambient[] = { 0.6f, 0.6f, 0.6f, 1.0f };
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lmodel_ambient);
     glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_FALSE);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
@@ -41,11 +42,13 @@ void MainWindow::initializeGL() {
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glShadeModel(GL_SMOOTH);
+    glEnable(GL_BLEND);
 
+    glEnable(GL_NORMALIZE);
+
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-
-    glEnable(GL_DEPTH_TEST);
 
     GLfloat light_positions[8][4] = {
         {-1.0f, -1.0f, -1.0f, 0.0f},
@@ -58,12 +61,20 @@ void MainWindow::initializeGL() {
         {1.0f, -1.0f, 1.0f, 0.0f}
     };
 
-    GLfloat diffuse_color[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+    GLfloat diffuse_color1[] = { 0.1f, 0.1f, 0.1f, 1.0f };
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 8; i+=2) {
         glEnable(GL_LIGHT0 + i);
         glLightfv(GL_LIGHT0 + i, GL_POSITION, light_positions[i]);
-        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse_color);
+        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse_color1);
+    }
+
+    GLfloat diffuse_color2[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+
+    for (int i = 1; i < 8; i+=2) {
+        glEnable(GL_LIGHT0 + i);
+        glLightfv(GL_LIGHT0 + i, GL_POSITION, light_positions[i]);
+        glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse_color2);
     }
 
 }
@@ -80,14 +91,85 @@ void MainWindow::resizeGL(int w, int h) {
 }
 
 void MainWindow::paintGL() {
+    /*float vertData[3 * 4] = {
+    0.f, 0.f, 0.f,   1.f, 0.f, 0.f,   1.f, 1.f, 0.f    0.f, 1.f, 0.f,   
+    };*/
+    //unsigned int tr[3 * 2] = {
+    //  0, 1, 2,   0, 2, 3
+    //};
+    //glGenBuffers(1, &m_vboTriangles);
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
+    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, (3 * 2) * sizeof(unsigned int),
+    //    (void*)tr, GL_STATIC_DRAW);
+
+    //std::vector<double> vertData(12, 0); //000, 100, 010, 110
+    //vertData[3] = 1;
+    //vertData[7] = 1;
+    //vertData[9] = 1;
+    //vertData[10] = 1;
+
+    //glGenBuffers(1, &m_vboVertices);
+    //glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
+    //glBufferData(GL_ARRAY_BUFFER, vertData.size() * sizeof(double),
+    //    (void*)vertData.data(), GL_STATIC_DRAW);
+
+    //std::vector<double> nrmlsData(12, 0);
+    //nrmlsData[2] = 1;
+    //nrmlsData[5] = 1;
+    //nrmlsData[8] = 1;
+    //nrmlsData[11] = 1;
+
+    //glGenBuffers(1, &m_vboNormals);
+    //glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+    //glBufferData(GL_ARRAY_BUFFER, nrmlsData.size() * sizeof(double),
+    //    (void*)nrmlsData.data(), GL_STATIC_DRAW);
+
+    //glGenVertexArrays(1, &m_vao);
+    //glBindVertexArray(m_vao);
+
+    //glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
+    //glEnableClientState(GL_VERTEX_ARRAY);
+    //glVertexPointer(3, GL_DOUBLE, 0, NULL);
+
+    //glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
+    //glEnableClientState(GL_NORMAL_ARRAY);
+    //glNormalPointer(GL_DOUBLE, 0, NULL);
+
+    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
+
+    //glClear(GL_COLOR_BUFFER_BIT);
+
+    //m_camera.Apply();
+
+    //GLfloat spec[] = { 0.6, 0.3, 0.2, 1 };
+    //GLfloat emis[] = { 0, 0.8, 0, 1 };
+    //GLfloat dif[] = { 0.5, 0.1, 0.5, 1 };
+    //GLfloat shin[] = { 50 };
+    //glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
+    //glMaterialfv(GL_FRONT, GL_EMISSION, emis);
+    //glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, dif);
+    //glMaterialfv(GL_FRONT, GL_SHININESS, shin);
+
+    //glDrawElements(GL_TRIANGLES, 3 * 2 * sizeof(unsigned int), GL_UNSIGNED_INT, 0);
+
     if (m_upd) {
         m_upd = false;
 
         glGenVertexArrays(1, &m_vao);
         glBindVertexArray(m_vao);
 
-        //const GLdouble* vertexData = reinterpret_cast<const GLdouble*>(m_model.Points().data());
-        std::vector<GLdouble> vertData(m_model.Points().size() * 3);
+        std::vector<unsigned int> tr(3 * m_model.TrinaglesNum());
+        for (size_t i = 0; i < m_model.Triangles().size(); i++)
+        {
+            tr[i] = m_model.Triangles()[i];
+        }
+
+        glGenBuffers(1, &m_vboTriangles);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * m_model.TrinaglesNum() * sizeof(unsigned int),
+            (void*)tr.data(), GL_STATIC_DRAW);
+
+        std::vector<double> vertData(m_model.Points().size() * 3);
         for (size_t i = 0; i < m_model.Points().size(); i++)
         {
             vertData[3 * i] = m_model.Points()[i].X();
@@ -97,11 +179,10 @@ void MainWindow::paintGL() {
 
         glGenBuffers(1, &m_vboVertices);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
-        glBufferData(GL_ARRAY_BUFFER, vertData.size() * sizeof(GLdouble),
-            vertData.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, vertData.size() * sizeof(double),
+            (void*)vertData.data(), GL_STATIC_DRAW);
 
-        //const GLdouble* normalsData = reinterpret_cast<const GLdouble*>(m_model.Normals().data());
-        std::vector<GLdouble> nrmlsData(m_model.Normals().size() * 3);
+        std::vector<double> nrmlsData(m_model.Normals().size() * 3);
         for (size_t i = 0; i < m_model.Normals().size(); i++)
         {
             nrmlsData[3 * i] = m_model.Normals()[i].X();
@@ -111,40 +192,45 @@ void MainWindow::paintGL() {
 
         glGenBuffers(1, &m_vboNormals);
         glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
-        glBufferData(GL_ARRAY_BUFFER, nrmlsData.size() * sizeof(GLdouble),
-            nrmlsData.data(), GL_STATIC_DRAW);
-
-        glGenBuffers(1, &m_vboTriangles);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.Triangles().size() * sizeof(size_t),
-            m_model.Triangles().data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, nrmlsData.size() * sizeof(double),
+            (void*)nrmlsData.data(), GL_STATIC_DRAW);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
-        glVertexAttribPointer(0, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(0);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(3, GL_DOUBLE, 0, NULL);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
-        glVertexAttribPointer(1, 3, GL_DOUBLE, GL_FALSE, 0, NULL);
-        glEnableVertexAttribArray(1);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glNormalPointer(GL_DOUBLE, 0, NULL);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
     }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     m_camera.Apply();
 
-    GLfloat mat_ambient[] = { 0.5f, 0.5f, 0.5f, 1.0f }; 
+    GLfloat mat_ambient[] = { 0.4f, 0.4f, 0.4f, 1.0f };
     GLfloat mat_diffuse[] = { 1.0f, 0.0f, 0.0f, 1.0f };
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse);
 
-    glBindVertexArray(m_vao);
     glDrawElements(GL_TRIANGLES, m_model.Triangles().size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
 
-    glFinish();
+    if (m_SurfSelection != -1) {
+        GLfloat mat_ambient2[] = { 0.6f, 0.6f, 0.6f, 1.0f };
+        GLfloat mat_diffuse2[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient2);
+        glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse2);
+        LibModel<double>::Surface srfc = m_model.Surfaces()[m_SurfSelection];
+
+        size_t size = 3 * (srfc.End() - srfc.Begin());
+
+        glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, (void*)(srfc.Begin() * 3 * sizeof(unsigned int)));
+        m_SurfSelection = -1;
+    }
+    //PaintModel();
 }
 
 void MainWindow::wheelEvent(QWheelEvent* event)
@@ -168,14 +254,17 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
         m_isDragRotat = true;
         m_lastMousePos = event->pos();
     }
+    m_pressed = true;
 }
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
+    m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y(), m_SurfSelection);
     if (m_lastMousePos != event->pos()) {
         if (m_isDragTransl) {
             QPoint delta = event->pos() - m_lastMousePos;
-            if (m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y())) {
+            int srfc;
+            if (m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y(), srfc)) {
                 m_camera.Translation(delta.x(), delta.y());
             }
         }
@@ -183,8 +272,8 @@ void MainWindow::mouseMoveEvent(QMouseEvent* event)
             m_camera.Rotation(m_lastMousePos.x(), m_lastMousePos.y(), event->pos().x(), event->pos().y());
         }
         m_lastMousePos = event->pos();
-        update();
     }
+    update();
     
 }
 
@@ -194,5 +283,34 @@ void MainWindow::mouseReleaseEvent(QMouseEvent* event)
         m_isDragTransl = false;
     } else if (event->button() == Qt::RightButton) {
         m_isDragRotat = false;
+    }
+    m_pressed = false;
+}
+
+void MainWindow::PaintModel()
+{
+    if (!m_model.Triangles().empty() && !m_model.Points().empty()) {
+        glBegin(GL_TRIANGLES);
+        for (size_t i = 0; i < m_model.TrinaglesNum(); i++)
+        {
+            const LibPoint<double>& A = m_model.GetPtInTrngl(i, 0);
+            const LibPoint<double>& B = m_model.GetPtInTrngl(i, 1);
+            const LibPoint<double>& C = m_model.GetPtInTrngl(i, 2);
+
+            const LibVector<double>& nA = m_model.GetNrmlsInTrngl(i, 0);
+            const LibVector<double>& nB = m_model.GetNrmlsInTrngl(i, 0);
+            const LibVector<double>& nC = m_model.GetNrmlsInTrngl(i, 0);
+
+            glNormal3d(nA.X(), nA.Y(), nA.Z());
+            glVertex3d(A.X(), A.Y(), A.Z());
+
+            glNormal3d(nB.X(), nB.Y(), nB.Z());
+            glVertex3d(B.X(), B.Y(), B.Z());
+
+            glNormal3d(nC.X(), nC.Y(), nC.Z());
+            glVertex3d(C.X(), C.Y(), C.Z());
+
+        }
+        glEnd();
     }
 }

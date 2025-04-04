@@ -395,17 +395,20 @@ private:
 		Model cube(Model::CreateCube(center, 1.0));
 
 		std::vector<Pt> points = cube.Points();
-		Pt A(1, 0, 0); Pt B(1, 0, 1); Pt C(1, 1, 1); Pt D(1, 1, 0);
-		Pt G(0, 0, 0); Pt E(0, 0, 1); Pt F(0, 1, 1); Pt K(0, 1, 0);
-		std::vector<Pt> expPt = { A, D, C, B, D, K, F, C, K, G, E, F, G, A, B, E, B, C, F, E, G, K, D, A };
+		Pt A(0, 0, 0); Pt B(1, 0, 0); Pt C(1, 1, 0); Pt D(0, 1, 0);
+		Pt G(0, 0, 1); Pt E(1, 0, 1); Pt F(1, 1, 1); Pt K(0, 1, 1);
+		std::vector<Pt> expPt = { A, D, C, B, G, E, F, K, A, B, E, G, D, K, F, C, A, G, K, D, C, F, E, B };
 		MY_ASSERT_EQ(expPt, points);
 
 		std::vector<Vec> normals = cube.Normals();
-		Vec nrml1(1, 0, 0); Vec nrml2(0, 1, 0); Vec nrml3(-1, 0, 0);
-		Vec nrml4(0, -1, 0); Vec nrml5(0, 0, 1); Vec nrml6(0, 0, -1);
-		std::vector<Vec> expNrml = { nrml1, nrml1, nrml1, nrml1, nrml2, nrml2, nrml2, nrml2,
-						nrml3, nrml3, nrml3, nrml3, nrml4, nrml4, nrml4, nrml4,
-						nrml5, nrml5, nrml5, nrml5, nrml6, nrml6, nrml6, nrml6 };
+		Vec nrml1(0, 0, 1); Vec nrml2(1, 0, 0); Vec nrml3(0, 1, 0);
+		std::vector<Vec> expNrml = {
+						nrml1 * (-1), nrml1 * (-1), nrml1 * (-1), nrml1 * (-1),
+						nrml1, nrml1, nrml1, nrml1,
+						nrml2 * (-1), nrml2 * (-1), nrml2 * (-1), nrml2 * (-1),
+						nrml2, nrml2, nrml2, nrml2,
+						nrml3 * (-1), nrml3 * (-1), nrml3 * (-1), nrml3 * (-1),
+						nrml3, nrml3, nrml3, nrml3 };
 		MY_ASSERT_EQ(expNrml, normals);
 
 		std::vector<Srfc> surfaces = cube.Surfaces();
@@ -443,18 +446,18 @@ private:
 		out.close();
 
 		Ray ray(Pt(1.22, 2, 1.5), Vec(-1.72, -2, -1.5));
-		Pt pt; Srfc srfc;
+		Pt pt; int srfc;
 
 		MY_ASSERT_TRUE(cube.IsIntersectionRay(ray, pt, srfc));
 		MY_ASSERT_VEC_EQ(Pt(0.36, 1, 0.75), pt);
-		MY_ASSERT_EQ(Srfc(2, 4), srfc);
+		MY_ASSERT_EQ(3, srfc);
 
 		std::ifstream in("data.bin", std::fstream::binary);
 		Model cube2;
 		cube2.Load(in);
 		in.close();
 
-		Pt pt2; Srfc srfc2;
+		Pt pt2; int srfc2;
 
 		MY_ASSERT_TRUE(cube.Points() == cube2.Points());
 		MY_ASSERT_TRUE(cube.Normals() == cube2.Normals());
@@ -475,13 +478,13 @@ private:
 		Model cylinder = Model::CreateCylinder(center, direction, 1, 2, 0.5);
 
 		Ray ray(Pt(1.5, -1.5, 2), Vec(1.5, 3.5, 2));
-		Pt pt; Srfc srfc;
+		Pt pt; int srfc;
 
 		MY_ASSERT_FALSE(cylinder.IsIntersectionRay(ray, pt, srfc));
 
 		ray.SetDirection(Vec(-3, 3, -1));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
-		MY_ASSERT_EQ(Srfc(6, cylinder.Triangles().size() / 3), srfc);
+		MY_ASSERT_EQ(2, srfc);
 		MY_ASSERT_EQ(Pt(0.5, -0.5, 1.666666666), pt);
 
 		ray = Ray(Pt(1, -1, 1.83), Vec(0.5, -0.5, 0.17));
@@ -489,22 +492,22 @@ private:
 
 		ray = Ray(Pt(0, 0, 1), Vec(1.5, -1.5, 1));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
-		MY_ASSERT_EQ(Srfc(6, cylinder.Triangles().size() / 3), srfc);
+		MY_ASSERT_EQ(2, srfc);
 		MY_ASSERT_EQ(Pt(0.5, -0.5, 1.333333333), pt);
 
 		ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
-		MY_ASSERT_EQ(Srfc(3, 6), srfc);
+		MY_ASSERT_EQ(1, srfc);
 		MY_ASSERT_EQ(Pt(0.264705882, -0.264705882, 2), pt);
 
 		ray = Ray(Pt(0, 0, 3), Vec(0, 0, -1));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
-		MY_ASSERT_EQ(Srfc(3, 6), srfc);
+		MY_ASSERT_EQ(1, srfc);
 		MY_ASSERT_EQ(Pt(0, 0, 2), pt);
 
 		ray = Ray(Pt(0, 0, -3), Vec(0, 0, 1));
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
-		MY_ASSERT_EQ(Srfc(0, 3), srfc);
+		MY_ASSERT_EQ(0, srfc);
 		MY_ASSERT_EQ(Pt(0, 0, 0), pt);
 
 		ray = Ray(Pt(1.5, -1.5, 0), Vec(0, 0, -1));
@@ -520,12 +523,12 @@ private:
 
 		Ray ray = Ray(Pt(1.5, -1.5, 2.7), Vec(-3, 3, -1.7));
 
-		Pt pt; Srfc srfc;
+		Pt pt; int srfc;
 		TIMER_START("Big Cylinder without thread");
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRay(ray, pt, srfc));
 		TIMER_END("Big Cylinder without thread");
 
-		Pt pt2; Srfc srfc2;
+		Pt pt2; int srfc2;
 		TIMER_START("Big Cylinder with thread");
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRayThread(ray, pt2, srfc2));
 		TIMER_END("Big Cylinder with thread");
@@ -534,7 +537,7 @@ private:
 		MY_ASSERT_EQ(srfc, srfc2);
 
 		TP tp(std::thread::hardware_concurrency());
-		Pt pt3; Srfc srfc3;
+		Pt pt3; int srfc3;
 		TIMER_START("Big Cylinder with threadPool");
 		MY_ASSERT_TRUE(cylinder.IsIntersectionRayTP(ray, pt3, srfc3, tp));
 		TIMER_END("Big Cylinder with threadPool");

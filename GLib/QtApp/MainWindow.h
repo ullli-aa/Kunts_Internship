@@ -27,7 +27,9 @@ protected:
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
 
-private:        
+private:
+    void PaintModel();
+        
     LibModel<double> m_model;
     Camera m_camera;
 
@@ -43,5 +45,8 @@ private:
     GLuint m_vboTriangles;
 
     bool m_upd = false;
+    int m_SurfSelection = -1;
+
+    bool m_pressed = false;
 };
 

@@ -148,32 +148,32 @@ public:
 		T x = center.X(); T y = center.Y(); T z = center.Z();
 		T halfLen = length / 2;
 
-		LibPoint<T> A(x + halfLen, y - halfLen, z - halfLen);
-		LibPoint<T> B(x + halfLen, y - halfLen, z + halfLen);
-		LibPoint<T> C(x + halfLen, y + halfLen, z + halfLen);
-		LibPoint<T> D(x + halfLen, y + halfLen, z - halfLen);
-		LibPoint<T> G(x - halfLen, y - halfLen, z - halfLen);
-		LibPoint<T> E(x - halfLen, y - halfLen, z + halfLen);
-		LibPoint<T> F(x - halfLen, y + halfLen, z + halfLen);
-		LibPoint<T> K(x - halfLen, y + halfLen, z - halfLen);
+		LibPoint<T> A(x - halfLen, y - halfLen, z - halfLen);
+		LibPoint<T> B(x + halfLen, y - halfLen, z - halfLen);
+		LibPoint<T> C(x + halfLen, y + halfLen, z - halfLen);
+		LibPoint<T> D(x - halfLen, y + halfLen, z - halfLen);
+		LibPoint<T> G(x - halfLen, y - halfLen, z + halfLen);
+		LibPoint<T> E(x + halfLen, y - halfLen, z + halfLen);
+		LibPoint<T> F(x + halfLen, y + halfLen, z + halfLen);
+		LibPoint<T> K(x - halfLen, y + halfLen, z + halfLen);
 
-		std::vector<LibPoint<T>> vecPoints = std::vector<LibPoint<T>>{A, D, C, B, D, K, F, C, K, G, E, F, G, A, B, E, B, C, F, E, G, K, D, A};
-		LibVector<T> AB = B - A;
-		LibVector<T> DA = A - D;
-		LibVector<T> KD = D - K;
+		std::vector<LibPoint<T>> vecPoints = std::vector<LibPoint<T>>{ A, D, C, B, G, E, F, K, A, B, E, G, D, K, F, C, A, G, K, D, C, F, E, B };
 		LibVector<T> FK = K - F;
 		LibVector<T> EF = F - E;
-		LibVector<T> EB = B - E;
+		LibVector<T> CF = F - C;
 
-		LibVector<T> nrml1 = AB.CrossProduct(DA);
-		LibVector<T> nrml2 = KD.CrossProduct(FK);
-		LibVector<T> nrml3 = EB.CrossProduct(EF);
-		std::vector<LibVector<T>> vecNormals = std::vector<LibVector<T>>{nrml1, nrml1, nrml1, nrml1,
+		LibVector<T> nrml1 = EF.CrossProduct(FK);
+		LibVector<T> nrml2 = CF.CrossProduct(EF) * (-1);
+		LibVector<T> nrml3 = CF.CrossProduct(FK) * (-1);
+
+		std::vector<LibVector<T>> vecNormals = std::vector<LibVector<T>>{
+						nrml1* (-1), nrml1* (-1), nrml1* (-1), nrml1* (-1),
+						nrml1, nrml1, nrml1, nrml1,
+						nrml2* (-1), nrml2* (-1), nrml2* (-1), nrml2* (-1),
 						nrml2, nrml2, nrml2, nrml2,
-						nrml1 * (-1), nrml1 * (-1), nrml1 * (-1), nrml1 * (-1),
-						nrml2 * (-1), nrml2 * (-1), nrml2 * (-1), nrml2 * (-1),
-						nrml3, nrml3, nrml3, nrml3,
-						nrml3 * (-1), nrml3 * (-1), nrml3 * (-1), nrml3 * (-1)};
+						nrml3* (-1), nrml3* (-1), nrml3* (-1), nrml3* (-1),
+						nrml3, nrml3, nrml3, nrml3
+						};
 
 		std::vector<Surface> vecSurfaces = {Surface(0, 2), Surface(2, 4), Surface(4, 6),
 						Surface(6, 8), Surface(8, 10),Surface(10, 12) };
@@ -249,7 +249,7 @@ public:
 		return model;
 	}
 
-	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
+	bool IsIntersectionRay(const LibRay<T>& ray, LibPoint<T>& pt, int& srfc) const {
 		TIMER_START("intersection of model and ray");
 
 		T dist = DBL_MAX;
@@ -286,7 +286,7 @@ public:
 		return true;
 	}
 
-	bool IsIntersectionRayThread(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc) const {
+	bool IsIntersectionRayThread(const LibRay<T>& ray, LibPoint<T>& pt, int& srfc) const {
 		TIMER_START("intersection with thread of model and ray");
 
 		auto processTriangles = [&](size_t trnglIndex, size_t count, T& minDist, size_t& minInd) {
@@ -360,7 +360,7 @@ public:
 		return true;
 	}
 
-	bool IsIntersectionRayTP(const LibRay<T>& ray, LibPoint<T>& pt, Surface& srfc,
+	bool IsIntersectionRayTP(const LibRay<T>& ray, LibPoint<T>& pt, int& srfc,
 		LibThreadPool& tp) {
 		TIMER_START("intersection with ThreadPool of model and ray");
 		const size_t trnglsCount = Triangles().size() / 3;
@@ -416,11 +416,13 @@ public:
 	}
 	
 protected:
-	const Surface& FindSurfForTrngl(size_t ind) const {
+	const int& FindSurfForTrngl(size_t ind) const {
+		int res = 0;
 		for (const Surface& surf : m_vecSurfaces) {
 			if (ind >= surf.Begin() && ind < surf.End()) {
-				return surf;
+				return res;
 			}
+			res++;
 		}
 	}
 
