@@ -25,6 +25,11 @@ void MainWindow::LoadModel(const std::wstring& filePath)
     update();
 }
 
+void MainWindow::SetModel(const LibModel<double>& mdl)
+{
+    m_model.SetModel(mdl);
+}
+
 void MainWindow::initializeGL() {
     initializeOpenGLFunctions();
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
@@ -69,7 +74,7 @@ void MainWindow::initializeGL() {
         glLightfv(GL_LIGHT0 + i, GL_DIFFUSE, diffuse_color1);
     }
 
-    GLfloat diffuse_color2[] = { 0.2f, 0.2f, 0.2f, 1.0f };
+    GLfloat diffuse_color2[] = { 0.4f, 0.4f, 0.4f, 1.0f };
 
     for (int i = 1; i < 8; i+=2) {
         glEnable(GL_LIGHT0 + i);
@@ -91,67 +96,6 @@ void MainWindow::resizeGL(int w, int h) {
 }
 
 void MainWindow::paintGL() {
-    /*float vertData[3 * 4] = {
-    0.f, 0.f, 0.f,   1.f, 0.f, 0.f,   1.f, 1.f, 0.f    0.f, 1.f, 0.f,   
-    };*/
-    //unsigned int tr[3 * 2] = {
-    //  0, 1, 2,   0, 2, 3
-    //};
-    //glGenBuffers(1, &m_vboTriangles);
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
-    //glBufferData(GL_ELEMENT_ARRAY_BUFFER, (3 * 2) * sizeof(unsigned int),
-    //    (void*)tr, GL_STATIC_DRAW);
-
-    //std::vector<double> vertData(12, 0); //000, 100, 010, 110
-    //vertData[3] = 1;
-    //vertData[7] = 1;
-    //vertData[9] = 1;
-    //vertData[10] = 1;
-
-    //glGenBuffers(1, &m_vboVertices);
-    //glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
-    //glBufferData(GL_ARRAY_BUFFER, vertData.size() * sizeof(double),
-    //    (void*)vertData.data(), GL_STATIC_DRAW);
-
-    //std::vector<double> nrmlsData(12, 0);
-    //nrmlsData[2] = 1;
-    //nrmlsData[5] = 1;
-    //nrmlsData[8] = 1;
-    //nrmlsData[11] = 1;
-
-    //glGenBuffers(1, &m_vboNormals);
-    //glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
-    //glBufferData(GL_ARRAY_BUFFER, nrmlsData.size() * sizeof(double),
-    //    (void*)nrmlsData.data(), GL_STATIC_DRAW);
-
-    //glGenVertexArrays(1, &m_vao);
-    //glBindVertexArray(m_vao);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, m_vboVertices);
-    //glEnableClientState(GL_VERTEX_ARRAY);
-    //glVertexPointer(3, GL_DOUBLE, 0, NULL);
-
-    //glBindBuffer(GL_ARRAY_BUFFER, m_vboNormals);
-    //glEnableClientState(GL_NORMAL_ARRAY);
-    //glNormalPointer(GL_DOUBLE, 0, NULL);
-
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
-
-    //glClear(GL_COLOR_BUFFER_BIT);
-
-    //m_camera.Apply();
-
-    //GLfloat spec[] = { 0.6, 0.3, 0.2, 1 };
-    //GLfloat emis[] = { 0, 0.8, 0, 1 };
-    //GLfloat dif[] = { 0.5, 0.1, 0.5, 1 };
-    //GLfloat shin[] = { 50 };
-    //glMaterialfv(GL_FRONT, GL_SPECULAR, spec);
-    //glMaterialfv(GL_FRONT, GL_EMISSION, emis);
-    //glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, dif);
-    //glMaterialfv(GL_FRONT, GL_SHININESS, shin);
-
-    //glDrawElements(GL_TRIANGLES, 3 * 2 * sizeof(unsigned int), GL_UNSIGNED_INT, 0);
-
     if (m_upd) {
         m_upd = false;
 
@@ -166,8 +110,8 @@ void MainWindow::paintGL() {
 
         glGenBuffers(1, &m_vboTriangles);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_vboTriangles);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, 3 * m_model.TrinaglesNum() * sizeof(unsigned int),
-            (void*)tr.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_model.Triangles().size() * sizeof(unsigned int),
+            tr.data(), GL_STATIC_DRAW);
 
         std::vector<double> vertData(m_model.Points().size() * 3);
         for (size_t i = 0; i < m_model.Points().size(); i++)
@@ -217,20 +161,19 @@ void MainWindow::paintGL() {
 
     glDrawElements(GL_TRIANGLES, m_model.Triangles().size(), GL_UNSIGNED_INT, 0);
 
-    if (m_SurfSelection != -1) {
+    if (m_indSurfSel != -1) {
         GLfloat mat_ambient2[] = { 0.6f, 0.6f, 0.6f, 1.0f };
         GLfloat mat_diffuse2[] = { 1.0f, 0.0f, 0.0f, 1.0f };
 
         glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient2);
         glMaterialfv(GL_FRONT, GL_DIFFUSE, mat_diffuse2);
-        LibModel<double>::Surface srfc = m_model.Surfaces()[m_SurfSelection];
+        LibModel<double>::Surface srfc = m_model.Surfaces()[m_indSurfSel];
 
         size_t size = 3 * (srfc.End() - srfc.Begin());
 
         glDrawElements(GL_TRIANGLES, size, GL_UNSIGNED_INT, (void*)(srfc.Begin() * 3 * sizeof(unsigned int)));
-        m_SurfSelection = -1;
+        m_indSurfSel = -1;
     }
-    //PaintModel();
 }
 
 void MainWindow::wheelEvent(QWheelEvent* event)
@@ -259,7 +202,7 @@ void MainWindow::mousePressEvent(QMouseEvent* event)
 
 void MainWindow::mouseMoveEvent(QMouseEvent* event)
 {
-    m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y(), m_SurfSelection);
+    m_camera.IsIntersRayWithModel(event->pos().x(), event->pos().y(), m_indSurfSel);
     if (m_lastMousePos != event->pos()) {
         if (m_isDragTransl) {
             QPoint delta = event->pos() - m_lastMousePos;

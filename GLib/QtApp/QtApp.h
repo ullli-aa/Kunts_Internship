@@ -14,6 +14,7 @@ public:
 
 private slots:
     void OpenFileDialog();
+    void OpenZip();
 
 private:
     void AddMenu();

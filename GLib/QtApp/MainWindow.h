@@ -15,6 +15,8 @@ public:
 
     void LoadModel(const std::wstring& filePath);
 
+    void SetModel(const LibModel<double>& mdl);
+
 protected:
     void initializeGL() override;
 
@@ -45,7 +47,7 @@ private:
     GLuint m_vboTriangles;
 
     bool m_upd = false;
-    int m_SurfSelection = -1;
+    int m_indSurfSel = -1;
 
     bool m_pressed = false;
 };

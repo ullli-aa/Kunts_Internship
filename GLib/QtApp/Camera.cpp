@@ -82,7 +82,7 @@ LibVector<double> Camera::PxlToMdlVec(int x_px, int y_px)
 LibRay<double> Camera::GetRayFromPx(int x_px, int y_px)
 {
     LibPoint<double> origin = PxlToScrnPt(x_px, y_px);
-    origin.SetZ(1000);
+    origin.SetZ(2 * m_model.Diagonal().LengthVector());
     origin = LibMatrix<double>::MultPt(origin, m_ScreenToModel);
 
     LibVector<double> direction = LibMatrix<double>::MultVec(LibVector<double>(0, 0, -1), m_ScreenToModel);

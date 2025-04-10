@@ -102,6 +102,34 @@ public:
 		return m_vecSurfaces;
 	}
 
+	inline void SetPoints(const std::vector<LibPoint<T>>& pts)
+	{
+		m_vecPoints = pts;
+	}
+
+	inline void SetNormals(const std::vector<LibVector<T>>& nrmls)
+	{
+		m_vecNormals = nrmls;
+	}
+
+	inline void SetTriangles(const std::vector<size_t>& trngls)
+	{
+		m_vecTriangles = trngls;
+	}
+
+	inline void SetSurfaces(const std::vector<Surface>& srfc)
+	{
+		m_vecSurfaces = srfc;
+	}
+
+	inline void SetModel(const LibModel<T> mdl) {
+		Clear();
+		SetPoints(mdl.Points());
+		SetNormals(mdl.Normals());
+		SetTriangles(mdl.Triangles());
+		SetSurfaces(mdl.Surfaces());
+	}
+
 	bool operator==(const LibModel<T>& other) const {
 		return Points() == other.Points() && Normals() == other.Normals() &&
 			Triangles() == other.Triangles() && Surfaces() == other.Surfaces();
@@ -179,15 +207,17 @@ public:
 						Surface(6, 8), Surface(8, 10),Surface(10, 12) };
 
 		std::vector<size_t> vecTriangles;
+		vecTriangles.resize(6 * 2 * 3);
+		int ind = 0;
 		for (size_t i = 0; i < vecPoints.size(); i += 4)
 		{
-			vecTriangles.push_back(i);
-			vecTriangles.push_back(i + 1);
-			vecTriangles.push_back(i + 2);
+			vecTriangles[ind++] = i;
+			vecTriangles[ind++] = i + 1;
+			vecTriangles[ind++] = i + 2;
 
-			vecTriangles.push_back(i);
-			vecTriangles.push_back(i + 2);
-			vecTriangles.push_back(i + 3);
+			vecTriangles[ind++] = i;
+			vecTriangles[ind++] = i + 2;
+			vecTriangles[ind++] = i + 3;
 		}
 
 		LibModel<T> model(vecPoints, vecNormals, vecTriangles, vecSurfaces);
@@ -226,7 +256,8 @@ public:
 			vecPoints.push_back(C);
 			vecPoints.push_back(D);
 
-			LibVector<T> normal1, normal2;
+			LibVector<T> normal1 = (A - vecPoints[0]).GetNormalize();
+			LibVector<T> normal2 = (B - vecPoints[pntsCountOnCrcl + 1]).GetNormalize();
 			cylndr.GetNormalInPt(A, normal1);
 			cylndr.GetNormalInPt(B, normal2);
 
@@ -274,6 +305,7 @@ public:
 		}
 
 		if (dist == DBL_MAX) {
+
 			TIMER_END("intersection of model and ray");
 			return false;
 		}
@@ -416,7 +448,7 @@ public:
 	}
 	
 protected:
-	const int& FindSurfForTrngl(size_t ind) const {
+	int FindSurfForTrngl(size_t ind) const {
 		int res = 0;
 		for (const Surface& surf : m_vecSurfaces) {
 			if (ind >= surf.Begin() && ind < surf.End()) {

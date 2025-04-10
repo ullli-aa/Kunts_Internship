@@ -46,7 +46,7 @@ public:
 		return matrix;
 	}
 
-	bool IsEqual(const LibMatrix<T>& other, T eps = LibEps::eps) {
+	bool IsEqual(const LibMatrix<T>& other, T eps = LibEps::eps) const {
 		LibMatrix<T> result;
 		for (int i = 0; i < 16; ++i) {
 			if (!LibEps::IsZero(Data()[i] - other.Data()[i], eps)) {
@@ -56,7 +56,7 @@ public:
 		return true;
 	}
 
-	bool operator==(const LibMatrix<T>& other) {
+	bool operator==(const LibMatrix<T>& other) const {
 		return this->IsEqual(other);
 	}
 
